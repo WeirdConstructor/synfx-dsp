@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Weird Constructor <weirdconstructor@gmail.com>
+// Copyright (c) 2021-2022 Weird Constructor <weirdconstructor@gmail.com>
 // This file is a part of synfx-dsp. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
 //
@@ -9,6 +9,10 @@
 // You will find a float type agnostic version in SamiPerttu's code.
 // I converted this to pure f32 for no good reason, other than making
 // the code more readable (for me).
+
+//! A biquad filter implementation.
+///
+/// It is unfortunately still missing some coefficient calculations for some types of filters.
 
 use std::f32::consts::*;
 

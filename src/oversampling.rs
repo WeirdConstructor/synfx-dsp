@@ -1,6 +1,8 @@
-// Copyright (c) 2021 Weird Constructor <weirdconstructor@gmail.com>
+// Copyright (c) 2021-2022 Weird Constructor <weirdconstructor@gmail.com>
 // This file is a part of synfx-dsp. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
+
+//! Oversampling related utilities, such as an up/downsampling filter.
 
 use crate::{Biquad, BiquadCoefs};
 
