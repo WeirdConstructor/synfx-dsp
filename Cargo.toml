@@ -11,3 +11,4 @@ repository = "https://github.com/WeirdConstructor/synfx-dsp"
 readme = "README.md"
 
 [dependencies]
+num-traits = "0.2.14"

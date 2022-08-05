@@ -1,5 +1,5 @@
 // Copyright (c) 2021 Weird Constructor <weirdconstructor@gmail.com>
-// This file is a part of HexoDSP. Released under GPL-3.0-or-later.
+// This file is a part of synfx-dsp. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
 //
 // The implementation of this Biquad Filter has been adapted from
@@ -45,7 +45,7 @@ impl BiquadCoefs {
     }
 
     /// Returns the Q for cascading a butterworth filter:
-    fn calc_cascaded_butter_q(order: usize, casc_idx: usize) -> f32 {
+    pub fn calc_cascaded_butter_q(order: usize, casc_idx: usize) -> f32 {
         let order = order as f32;
         let casc_idx = casc_idx as f32;
 

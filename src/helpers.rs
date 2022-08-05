@@ -2,17 +2,7 @@
 // This file is a part of HexoDSP. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
 
-use num_traits::{cast::FromPrimitive, cast::ToPrimitive, Float, FloatConst};
 use std::cell::RefCell;
-
-macro_rules! trait_alias {
-    ($name:ident = $base1:ident + $($base2:ident +)+) => {
-        pub trait $name: $base1 $(+ $base2)+ { }
-        impl<T: $base1 $(+ $base2)+> $name for T { }
-    };
-}
-
-trait_alias!(Flt = Float + FloatConst + ToPrimitive + FromPrimitive +);
 
 /// Logarithmic table size of the table in [fast_cos] / [fast_sin].
 static FAST_COS_TAB_LOG2_SIZE: usize = 9;
@@ -255,98 +245,12 @@ impl SplitMix64 {
     }
 }
 
-/// Linear crossfade.
-///
-/// * `v1` - signal 1, range -1.0 to 1.0
-/// * `v2` - signal 2, range -1.0 to 1.0
-/// * `mix` - mix position, range 0.0 to 1.0, mid is at 0.5
-#[inline]
-pub fn crossfade<F: Flt>(v1: F, v2: F, mix: F) -> F {
-    v1 * (f::<F>(1.0) - mix) + v2 * mix
-}
-
-/// Linear crossfade with clipping the `v2` result.
-///
-/// This crossfade actually does clip the `v2` signal to the -1.0 to 1.0
-/// range. This is useful for Dry/Wet of plugins that might go beyond the
-/// normal signal range.
-///
-/// * `v1` - signal 1, range -1.0 to 1.0
-/// * `v2` - signal 2, range -1.0 to 1.0
-/// * `mix` - mix position, range 0.0 to 1.0, mid is at 0.5
-#[inline]
-pub fn crossfade_clip<F: Flt>(v1: F, v2: F, mix: F) -> F {
-    v1 * (f::<F>(1.0) - mix) + (v2 * mix).min(f::<F>(1.0)).max(f::<F>(-1.0))
-}
-
-/// Linear (f32) crossfade with driving the `v2` result through a tanh().
-///
-/// * `v1` - signal 1, range -1.0 to 1.0
-/// * `v2` - signal 2, range -1.0 to 1.0
-/// * `mix` - mix position, range 0.0 to 1.0, mid is at 0.5
-#[inline]
-pub fn crossfade_drive_tanh(v1: f32, v2: f32, mix: f32) -> f32 {
-    v1 * (1.0 - mix) + tanh_approx_drive(v2 * mix * 0.111, 0.95) * 0.9999
-}
-
-/// Constant power crossfade.
-///
-/// * `v1` - signal 1, range -1.0 to 1.0
-/// * `v2` - signal 2, range -1.0 to 1.0
-/// * `mix` - mix position, range 0.0 to 1.0, mid is at 0.5
-#[inline]
-pub fn crossfade_cpow(v1: f32, v2: f32, mix: f32) -> f32 {
-    let s1 = (mix * std::f32::consts::FRAC_PI_2).sin();
-    let s2 = ((1.0 - mix) * std::f32::consts::FRAC_PI_2).sin();
-    v1 * s2 + v2 * s1
-}
-
-const CROSS_LOG_MIN: f32 = -13.815510557964274; // (0.000001_f32).ln();
-const CROSS_LOG_MAX: f32 = 0.0; // (1.0_f32).ln();
-
-/// Logarithmic crossfade.
-///
-/// * `v1` - signal 1, range -1.0 to 1.0
-/// * `v2` - signal 2, range -1.0 to 1.0
-/// * `mix` - mix position, range 0.0 to 1.0, mid is at 0.5
-#[inline]
-pub fn crossfade_log(v1: f32, v2: f32, mix: f32) -> f32 {
-    let x = (mix * (CROSS_LOG_MAX - CROSS_LOG_MIN) + CROSS_LOG_MIN).exp();
-    crossfade(v1, v2, x)
-}
-
-/// Exponential crossfade.
-///
-/// * `v1` - signal 1, range -1.0 to 1.0
-/// * `v2` - signal 2, range -1.0 to 1.0
-/// * `mix` - mix position, range 0.0 to 1.0, mid is at 0.5
-#[inline]
-pub fn crossfade_exp(v1: f32, v2: f32, mix: f32) -> f32 {
-    crossfade(v1, v2, mix * mix)
-}
-
-#[inline]
-pub fn clamp(f: f32, min: f32, max: f32) -> f32 {
-    if f < min {
-        min
-    } else if f > max {
-        max
-    } else {
-        f
-    }
-}
-
 pub fn square_135(phase: f32) -> f32 {
     fast_sin(phase) + fast_sin(phase * 3.0) / 3.0 + fast_sin(phase * 5.0) / 5.0
 }
 
 pub fn square_35(phase: f32) -> f32 {
     fast_sin(phase * 3.0) / 3.0 + fast_sin(phase * 5.0) / 5.0
-}
-
-// note: MIDI note value?
-pub fn note_to_freq(note: f32) -> f32 {
-    440.0 * (2.0_f32).powf((note - 69.0) / 12.0)
 }
 
 // Ported from LMMS under GPLv2
@@ -410,34 +314,9 @@ pub fn lerp(x: f32, a: f32, b: f32) -> f32 {
 /// * `a` - value at x=0.0
 /// * `b` - value at x=1.0
 /// * `x` - value between 0.0 and 1.0 to blend between `a` and `b`.
+#[inline]
 pub fn lerp64(x: f64, a: f64, b: f64) -> f64 {
     (a * (1.0 - x)) + (b * x)
-}
-
-pub fn p2range(x: f32, a: f32, b: f32) -> f32 {
-    lerp(x, a, b)
-}
-
-pub fn p2range_exp(x: f32, a: f32, b: f32) -> f32 {
-    let x = x * x;
-    (a * (1.0 - x)) + (b * x)
-}
-
-pub fn p2range_exp4(x: f32, a: f32, b: f32) -> f32 {
-    let x = x * x * x * x;
-    (a * (1.0 - x)) + (b * x)
-}
-
-pub fn range2p(v: f32, a: f32, b: f32) -> f32 {
-    ((v - a) / (b - a)).abs()
-}
-
-pub fn range2p_exp(v: f32, a: f32, b: f32) -> f32 {
-    (((v - a) / (b - a)).abs()).sqrt()
-}
-
-pub fn range2p_exp4(v: f32, a: f32, b: f32) -> f32 {
-    (((v - a) / (b - a)).abs()).sqrt().sqrt()
 }
 
 /// ```text
@@ -448,71 +327,6 @@ pub fn gain2coef(gain: f32) -> f32 {
         10.0_f32.powf(gain * 0.05)
     } else {
         0.0
-    }
-}
-
-// quickerTanh / quickerTanh64 credits to mopo synthesis library:
-// Under GPLv3 or any later.
-// Little IO <littleioaudio@gmail.com>
-// Matt Tytel <matthewtytel@gmail.com>
-pub fn quicker_tanh64(v: f64) -> f64 {
-    let square = v * v;
-    v / (1.0 + square / (3.0 + square / 5.0))
-}
-
-#[inline]
-pub fn quicker_tanh(v: f32) -> f32 {
-    let square = v * v;
-    v / (1.0 + square / (3.0 + square / 5.0))
-}
-
-// quickTanh / quickTanh64 credits to mopo synthesis library:
-// Under GPLv3 or any later.
-// Little IO <littleioaudio@gmail.com>
-// Matt Tytel <matthewtytel@gmail.com>
-pub fn quick_tanh64(v: f64) -> f64 {
-    let abs_v = v.abs();
-    let square = v * v;
-    let num = v
-        * (2.45550750702956
-            + 2.45550750702956 * abs_v
-            + square * (0.893229853513558 + 0.821226666969744 * abs_v));
-    let den =
-        2.44506634652299 + (2.44506634652299 + square) * (v + 0.814642734961073 * v * abs_v).abs();
-
-    num / den
-}
-
-pub fn quick_tanh(v: f32) -> f32 {
-    let abs_v = v.abs();
-    let square = v * v;
-    let num = v
-        * (2.45550750702956
-            + 2.45550750702956 * abs_v
-            + square * (0.893229853513558 + 0.821226666969744 * abs_v));
-    let den =
-        2.44506634652299 + (2.44506634652299 + square) * (v + 0.814642734961073 * v * abs_v).abs();
-
-    num / den
-}
-
-// Taken from ValleyAudio
-// Copyright Dale Johnson
-// https://github.dev/ValleyAudio/ValleyRackFree/tree/v2.0
-// Under GPLv3 license
-pub fn tanh_approx_drive(v: f32, drive: f32) -> f32 {
-    let x = v * drive;
-
-    if x < -1.25 {
-        -1.0
-    } else if x < -0.75 {
-        1.0 - (x * (-2.5 - x) - 0.5625) - 1.0
-    } else if x > 1.25 {
-        1.0
-    } else if x > 0.75 {
-        x * (2.5 - x) - 0.5625
-    } else {
-        x
     }
 }
 
@@ -963,30 +777,6 @@ impl<F: Flt> RampValue<F> {
 
 /// Default size of the delay buffer: 5 seconds at 8 times 48kHz
 const DEFAULT_DELAY_BUFFER_SAMPLES: usize = 8 * 48000 * 5;
-
-macro_rules! fc {
-    ($F: ident, $e: expr) => {
-        F::from_f64($e).unwrap()
-    };
-}
-
-#[allow(dead_code)]
-#[inline]
-fn f<F: Flt>(x: f64) -> F {
-    F::from_f64(x).unwrap()
-}
-
-#[allow(dead_code)]
-#[inline]
-fn fclamp<F: Flt>(x: F, mi: F, mx: F) -> F {
-    x.max(mi).min(mx)
-}
-
-#[allow(dead_code)]
-#[inline]
-fn fclampc<F: Flt>(x: F, mi: f64, mx: f64) -> F {
-    x.max(f(mi)).min(f(mx))
-}
 
 /// Hermite / Cubic interpolation of a buffer full of samples at the given _index_.
 /// _len_ is the buffer length to consider and wrap the index into. And _fract_ is the
@@ -2674,24 +2464,3 @@ pub fn apply_distortion(s: f32, damt: f32, dist_type: u8) -> f32 {
 //        s
 //    }
 //}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn check_range2p_exp() {
-        let a = p2range_exp(0.5, 1.0, 100.0);
-        let x = range2p_exp(a, 1.0, 100.0);
-
-        assert!((x - 0.5).abs() < std::f32::EPSILON);
-    }
-
-    #[test]
-    fn check_range2p() {
-        let a = p2range(0.5, 1.0, 100.0);
-        let x = range2p(a, 1.0, 100.0);
-
-        assert!((x - 0.5).abs() < std::f32::EPSILON);
-    }
-}

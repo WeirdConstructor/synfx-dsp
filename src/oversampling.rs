@@ -1,8 +1,8 @@
 // Copyright (c) 2021 Weird Constructor <weirdconstructor@gmail.com>
-// This file is a part of HexoDSP. Released under GPL-3.0-or-later.
+// This file is a part of synfx-dsp. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
 
-use crate::Biquad;
+use crate::{Biquad, BiquadCoefs};
 
 // Loosely adapted from https://github.com/VCVRack/Befaco/blob/v1/src/ChowDSP.hpp
 // Copyright (c) 2019-2020 Andrew Belt and Befaco contributors
