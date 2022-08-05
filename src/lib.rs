@@ -35,6 +35,7 @@ mod low_freq;
 mod delay;
 mod oscillators;
 mod filters;
+mod dattorro;
 
 pub use approx::*;
 pub use biquad::{Biquad, BiquadCoefs};
@@ -47,6 +48,7 @@ pub use low_freq::*;
 pub use delay::*;
 pub use oscillators::*;
 pub use filters::*;
+pub use dattorro::DattorroReverb;
 
 use num_traits::{cast::FromPrimitive, cast::ToPrimitive, Float, FloatConst};
 

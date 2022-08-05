@@ -1,5 +1,5 @@
-// Copyright (c) 2021 Weird Constructor <weirdconstructor@gmail.com>
-// This file is a part of HexoDSP. Released under GPL-3.0-or-later.
+// Copyright (c) 2021-2022 Weird Constructor <weirdconstructor@gmail.com>
+// This file is a part of synfx-dsp. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
 
 // This file contains a reverb implementation that is based
@@ -15,7 +15,10 @@
 // And: https://ccrma.stanford.edu/~dattorro/music.html
 // And: https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf
 
-use crate::dsp::helpers::crossfade;
+//! Contains the implementation of the Dattorro plate reverb.
+
+use crate::crossfade;
+use crate::{AllPass, DCBlockFilter, DelayBuffer, OnePoleHPF, OnePoleLPF, TriSawLFO};
 
 const DAT_SAMPLE_RATE: f64 = 29761.0;
 const DAT_SAMPLES_PER_MS: f64 = DAT_SAMPLE_RATE / 1000.0;
@@ -69,8 +72,7 @@ const DAT_PLATE_DIFFUSION2: f64 = 0.5;
 const DAT_LFO_EXCURSION_MS: f64 = 16.0 / DAT_SAMPLES_PER_MS;
 const DAT_LFO_EXCURSION_MOD_MAX: f64 = 16.0;
 
-use crate::dsp::helpers::{AllPass, DCBlockFilter, DelayBuffer, OnePoleHPF, OnePoleLPF, TriSawLFO};
-
+/// Dattorro plate reverb implementation.
 #[derive(Debug, Clone)]
 pub struct DattorroReverb {
     last_scale: f64,
