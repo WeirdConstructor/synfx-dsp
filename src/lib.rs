@@ -116,7 +116,7 @@ pub fn gain2coef(gain: f32) -> f32 {
 /// of 4 at `0.0`. You can vary `v` as you like.
 ///
 ///```
-/// use hexodsp::dsp::helpers::*;
+/// use synfx_dsp::*;
 ///
 /// assert!(((sqrt4_to_pow4(0.25, 0.0) - 0.25_f32 * 0.25 * 0.25 * 0.25)
 ///          .abs() - 1.0)

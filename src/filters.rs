@@ -19,7 +19,7 @@ use crate::{Flt, f};
 /// * `z`      - The internal one sample buffer of the filter.
 ///
 ///```
-///    use hexodsp::dsp::helpers::*;
+///    use synfx_dsp::*;
 ///
 ///    let samples  = vec![0.0; 44100];
 ///    let mut z    = 0.0;
@@ -136,7 +136,7 @@ impl FixedOnePole {
 /// * `y`      - The second internal buffer of the filter.
 ///
 ///```
-///    use hexodsp::dsp::helpers::*;
+///    use synfx_dsp::*;
 ///
 ///    let samples  = vec![0.0; 44100];
 ///    let mut z    = 0.0;
@@ -230,7 +230,7 @@ impl<F: Flt> OnePoleHPF<F> {
 /// * `z`      - The internal one sample buffer of the filter.
 ///
 ///```
-///    use hexodsp::dsp::helpers::*;
+///    use synfx_dsp::*;
 ///
 ///    let samples  = vec![0.0; 44100];
 ///    let mut z    = 0.0;
@@ -268,7 +268,7 @@ pub fn process_1pole_tpt_lowpass(input: f32, freq: f32, israte: f32, z: &mut f32
 /// * `z`      - The internal one sample buffer of the filter.
 ///
 ///```
-///    use hexodsp::dsp::helpers::*;
+///    use synfx_dsp::*;
 ///
 ///    let samples  = vec![0.0; 44100];
 ///    let mut z    = 0.0;
@@ -315,7 +315,7 @@ const FILTER_OVERSAMPLE_HAL_CHAMBERLIN: usize = 2;
 /// Returned are the results of the high and notch filter.
 ///
 ///```
-///    use hexodsp::dsp::helpers::*;
+///    use synfx_dsp::*;
 ///
 ///    let samples  = vec![0.0; 44100];
 ///    let mut band = 0.0;
@@ -375,7 +375,7 @@ pub fn process_hal_chamberlin_svf(
 /// For a notch or peak filter signal, please consult the following example:
 ///
 ///```
-///    use hexodsp::dsp::helpers::*;
+///    use synfx_dsp::*;
 ///
 ///    let samples   = vec![0.0; 44100];
 ///    let mut ic1eq = 0.0;
@@ -451,7 +451,7 @@ pub fn process_simper_svf(
 /// * `delay` - A buffer holding other delayed samples.
 ///
 ///```
-///    use hexodsp::dsp::helpers::*;
+///    use synfx_dsp::*;
 ///
 ///    let samples  = vec![0.0; 44100];
 ///    let mut b0   = 0.0;

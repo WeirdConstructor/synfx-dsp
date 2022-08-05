@@ -106,7 +106,7 @@ pub fn lerp64(x: f64, a: f64, b: f64) -> f64 {
 /// Commonly used like this:
 ///
 ///```
-/// use hexodsp::dsp::helpers::cubic_interpolate;
+/// use synfx_dsp::cubic_interpolate;
 ///
 /// let buf : [f32; 9] = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2];
 /// let pos = 3.3_f32;

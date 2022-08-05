@@ -45,7 +45,7 @@ fn poly_blep(t: f32, dt: f32) -> f32 {
 /// Here is a quick example on how to use it:
 ///
 ///```
-/// use synfx_dsp::PolyBlepOscillator, rand_01, init_cos_tab};
+/// use synfx_dsp::{PolyBlepOscillator, rand_01, init_cos_tab};
 /// init_cos_tab();
 ///
 /// // Randomize the initial phase to make cancellation on summing less
@@ -86,7 +86,7 @@ impl PolyBlepOscillator {
     /// oscillators.
     ///
     ///```
-    /// use hexodsp::dsp::helpers::{PolyBlepOscillator, rand_01};
+    /// use synfx_dsp::*;
     ///
     /// let mut osc = PolyBlepOscillator::new(rand_01() * 0.25);
     ///```
@@ -107,7 +107,7 @@ impl PolyBlepOscillator {
     /// * `freq` - The frequency in Hz.
     /// * `israte` - The inverse sampling rate, or seconds per sample as in eg. `1.0 / 44100.0`.
     ///```
-    /// use hexodsp::dsp::helpers::{PolyBlepOscillator, rand_01};
+    /// use synfx_dsp::*;
     ///
     /// let mut osc = PolyBlepOscillator::new(rand_01() * 0.25);
     ///
@@ -136,7 +136,7 @@ impl PolyBlepOscillator {
     /// * `freq` - The frequency in Hz.
     /// * `israte` - The inverse sampling rate, or seconds per sample as in eg. `1.0 / 44100.0`.
     ///```
-    /// use hexodsp::dsp::helpers::{PolyBlepOscillator, rand_01};
+    /// use synfx_dsp::*;
     ///
     /// let mut osc = PolyBlepOscillator::new(rand_01() * 0.25);
     ///
@@ -174,7 +174,7 @@ impl PolyBlepOscillator {
     /// * `freq` - The frequency in Hz.
     /// * `israte` - The inverse sampling rate, or seconds per sample as in eg. `1.0 / 44100.0`.
     ///```
-    /// use hexodsp::dsp::helpers::{PolyBlepOscillator, rand_01};
+    /// use synfx_dsp::*;
     ///
     /// let mut osc = PolyBlepOscillator::new(rand_01() * 0.25);
     ///
@@ -207,7 +207,7 @@ impl PolyBlepOscillator {
     /// * `israte` - The inverse sampling rate, or seconds per sample as in eg. `1.0 / 44100.0`.
     /// * `pw` - The pulse width. Use the value 0.0 for a square wave.
     ///```
-    /// use hexodsp::dsp::helpers::{PolyBlepOscillator, rand_01};
+    /// use synfx_dsp::*;
     ///
     /// let mut osc = PolyBlepOscillator::new(rand_01() * 0.25);
     ///
@@ -248,7 +248,7 @@ impl PolyBlepOscillator {
     /// * `israte` - The inverse sampling rate, or seconds per sample as in eg. `1.0 / 44100.0`.
     /// * `pw` - The pulse width. Use the value 0.0 for a square wave.
     ///```
-    /// use hexodsp::dsp::helpers::{PolyBlepOscillator, rand_01};
+    /// use synfx_dsp::*;
     ///
     /// let mut osc = PolyBlepOscillator::new(rand_01() * 0.25);
     ///
@@ -290,7 +290,7 @@ impl PolyBlepOscillator {
 /// control values.
 ///
 ///```
-/// use hexodsp::dsp::helpers::{VPSOscillator, rand_01};
+/// use synfx_dsp::*;
 ///
 /// // Randomize the initial phase to make cancellation on summing less
 /// // likely:
@@ -318,8 +318,8 @@ impl PolyBlepOscillator {
 /// combinations, even without distortion.
 ///
 ///```
-/// use hexodsp::dsp::helpers::{VPSOscillator, rand_01, apply_distortion};
-/// use hexodsp::dsp::biquad::Oversampling;
+/// use synfx_dsp::{VPSOscillator, rand_01, apply_distortion};
+/// use synfx_dsp::Oversampling;
 ///
 /// let mut osc = VPSOscillator::new(rand_01() * 0.25);
 /// let mut ovr : Oversampling<4> = Oversampling::new();

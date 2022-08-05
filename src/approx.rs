@@ -36,7 +36,7 @@ const PHASE_SCALE: f32 = 1.0_f32 / (std::f32::consts::TAU);
 /// Don't forget to call [init_cos_tab] before using this!
 ///
 ///```
-/// use hexodsp::dsp::helpers::*;
+/// use synfx_dsp::*;
 /// init_cos_tab(); // Once on process initialization.
 ///
 /// // ...
@@ -70,7 +70,7 @@ pub fn fast_cos(mut x: f32) -> f32 {
 /// Don't forget to call [init_cos_tab] before using this!
 ///
 ///```
-/// use hexodsp::dsp::helpers::*;
+/// use synfx_dsp::*;
 /// init_cos_tab(); // Once on process initialization.
 ///
 /// // ...
