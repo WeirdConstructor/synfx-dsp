@@ -48,7 +48,7 @@ pub use low_freq::*;
 pub use delay::*;
 pub use oscillators::*;
 pub use filters::*;
-pub use dattorro::DattorroReverb;
+pub use dattorro::{DattorroReverb, DattorroReverbParams};
 
 use num_traits::{cast::FromPrimitive, cast::ToPrimitive, Float, FloatConst};
 
