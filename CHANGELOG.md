@@ -1,4 +1,4 @@
-0.5.2 (unreleased)
+0.5.2 (2022-08-06)
 ==================
 
 * Feature: Pulled over `AtomicFloat` and `AtomicFloatPair` from HexoDSP.

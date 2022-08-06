@@ -1,10 +1,10 @@
 [package]
 name = "synfx-dsp"
-version = "0.5.1"
+version = "0.5.2"
 edition = "2021"
 authors = ["Weird Constructor <weirdconstructor@gmail.com>"]
 license = "GPL-3.0-or-later"
-description = "Real Time Audio Synthesis and Effect DSP algorithms and utility functions for Rust"
+description = "DSP real time audio synthesis, effect algorithms and utilities for Rust"
 keywords = ["audio", "real-time", "synthesis", "dsp", "music"]
 categories = ["multimedia::audio", "multimedia", "algorithms", "mathematics"]
 repository = "https://github.com/WeirdConstructor/synfx-dsp"

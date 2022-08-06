@@ -1,6 +1,6 @@
 # synfx-dsp
 
-synfx-dsp Real Time Audio Synthesis and Effect DSP algorithms and utility functions for Rust.
+synfx-dsp DSP real time audio synthesis, effect algorithms and utilities for Rust
 
 Most of the algorithms and implementations in this library have been
 implemented for [HexoDSP](https://github.com/WeirdConstructor/HexoDSP) and used
