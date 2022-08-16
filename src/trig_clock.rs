@@ -16,6 +16,59 @@ pub const TRIG_LOW_THRES: f32 = 0.25;
 /// a logical '1'. Anything below this is a logical '0'.
 pub const TRIG_HIGH_THRES: f32 = 0.5;
 
+/// Gate signal generator for HexoDSP nodes.
+///
+/// This generator generates a gate signal when [GateSignal::trigger] is called.
+/// The length is given as parameter to [GateSignal::next].
+#[derive(Debug, Clone, Copy)]
+pub struct GateSignal {
+    ms_per_sample: f32,
+    ms_count: f32,
+}
+
+impl GateSignal {
+    /// Create a new gate generator
+    pub fn new() -> Self {
+        Self { ms_per_sample: 1000.0 / 44100.0, ms_count: 0.0 }
+    }
+
+    /// Reset the gate generator.
+    pub fn reset(&mut self) {
+        self.ms_count = 0.0;
+    }
+
+    /// Set the sample rate
+    pub fn set_sample_rate(&mut self, srate: f32) {
+        self.ms_per_sample = 1000.0 / srate;
+    }
+
+    /// Start a new gate the next time [TrigSignal::next] is called.
+    #[inline]
+    pub fn trigger(&mut self) {
+        self.ms_count = 0.0001;
+    }
+
+    /// Gate signal output, the length is given via 'length_ms'.
+    #[inline]
+    pub fn next(&mut self, length_ms: f32) -> f32 {
+        if self.ms_count > 0.0 {
+            self.ms_count += self.ms_per_sample;
+            if (self.ms_count - 0.0001) > length_ms {
+                self.ms_count = 0.0;
+            }
+            1.0
+        } else {
+            0.0
+        }
+    }
+}
+
+impl Default for GateSignal {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Trigger signal generator for HexoDSP nodes.
 ///
 /// A trigger in HexoSynth and HexoDSP is commonly 2.0 milliseconds.
