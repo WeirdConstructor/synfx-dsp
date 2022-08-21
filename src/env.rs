@@ -8,7 +8,6 @@ struct EnvState {
     srate_ms: f32,
     stage: u32,
     phase: f32,
-    inc: f32,
     start: f32,
     current: f32,
 }
@@ -19,7 +18,6 @@ impl EnvState {
             srate_ms: 44100.0 / 1000.0,
             stage: 0,
             phase: 0.0,
-            inc: 0.0,
             start: 0.0,
             current: 0.0,
         }
