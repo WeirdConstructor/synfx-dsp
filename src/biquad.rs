@@ -13,7 +13,6 @@
 //! A biquad filter implementation.
 ///
 /// It is unfortunately still missing some coefficient calculations for some types of filters.
-
 use std::f32::consts::*;
 
 #[derive(Copy, Clone, Debug, Default)]

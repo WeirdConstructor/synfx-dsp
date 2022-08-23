@@ -88,7 +88,6 @@ pub fn square_35(phase: f32) -> f32 {
     fast_sin(phase * 3.0) / 3.0 + fast_sin(phase * 5.0) / 5.0
 }
 
-
 // quickerTanh / quickerTanh64 credits to mopo synthesis library:
 // Under GPLv3 or any later.
 // Little IO <littleioaudio@gmail.com>

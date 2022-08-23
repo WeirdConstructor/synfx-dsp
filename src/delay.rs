@@ -2,11 +2,10 @@
 // This file is a part of synfx-dsp. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
 
-
 //! Interpolated delay line implementation and all-pass/comb filter implementations based on that.
 
-use crate::{Flt, f};
 use crate::cubic_interpolate;
+use crate::{f, Flt};
 
 /// Default size of the delay buffer: 5 seconds at 8 times 48kHz
 const DEFAULT_DELAY_BUFFER_SAMPLES: usize = 8 * 48000 * 5;
@@ -294,4 +293,3 @@ impl Comb {
         v + s * g
     }
 }
-

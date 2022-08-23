@@ -4,7 +4,7 @@
 
 //! A collection of filters, ranging from simple one poles to more interesting ones.
 
-use crate::{Flt, f};
+use crate::{f, Flt};
 
 // one pole lp from valley rack free:
 // https://github.com/ValleyAudio/ValleyRackFree/blob/v1.0/src/Common/DSP/OnePoleFilters.cpp
@@ -557,4 +557,3 @@ impl<F: Flt> DCBlockFilter<F> {
         y as F
     }
 }
-

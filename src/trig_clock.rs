@@ -354,4 +354,3 @@ impl TriggerSampleClock {
         self.clock_samples
     }
 }
-

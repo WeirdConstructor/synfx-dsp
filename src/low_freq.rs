@@ -4,7 +4,7 @@
 
 //! Low frequency utilities for handling control signals (partially also at audio rate).
 
-use crate::{Flt, f, fclampc};
+use crate::{f, fclampc, Flt};
 
 // Adapted from https://github.com/ValleyAudio/ValleyRackFree/blob/v1.0/src/Common/DSP/LFO.hpp
 //
@@ -384,4 +384,3 @@ impl CtrlPitchQuantizer {
         self.keys[key]
     }
 }
-

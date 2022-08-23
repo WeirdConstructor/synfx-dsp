@@ -48,13 +48,7 @@ pub struct EnvState {
 impl EnvState {
     /// Create a new envelope state structure.
     pub fn new() -> Self {
-        Self {
-            srate_ms: 44100.0 / 1000.0,
-            stage: 0,
-            phase: 0.0,
-            start: 0.0,
-            current: 0.0,
-        }
+        Self { srate_ms: 44100.0 / 1000.0, stage: 0, phase: 0.0, start: 0.0, current: 0.0 }
     }
 
     pub fn set_sample_rate(&mut self, srate: f32) {

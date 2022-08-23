@@ -49,4 +49,3 @@ pub fn f_fold_distort(gain: f32, threshold: f32, i: f32) -> f32 {
         gain * i
     }
 }
-

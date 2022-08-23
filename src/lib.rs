@@ -25,36 +25,36 @@ are actually covered by a test suite.
 */
 
 mod approx;
+mod atomic;
 mod biquad;
+mod dattorro;
+mod delay;
+mod env;
+mod filters;
 mod interpolation;
+mod low_freq;
+mod oscillators;
 mod oversampling;
 mod rand;
+mod test;
 mod trig_clock;
 mod waveshapers;
-mod low_freq;
-mod delay;
-mod oscillators;
-mod filters;
-mod dattorro;
-mod atomic;
-mod env;
-mod test;
 
 pub use approx::*;
+pub use atomic::*;
 pub use biquad::{Biquad, BiquadCoefs};
+pub use dattorro::{DattorroReverb, DattorroReverbParams};
+pub use delay::*;
+pub use env::*;
+pub use filters::*;
 pub use interpolation::*;
+pub use low_freq::*;
+pub use oscillators::*;
 pub use oversampling::Oversampling;
 pub use rand::*;
+pub use test::*;
 pub use trig_clock::*;
 pub use waveshapers::*;
-pub use low_freq::*;
-pub use delay::*;
-pub use oscillators::*;
-pub use filters::*;
-pub use dattorro::{DattorroReverb, DattorroReverbParams};
-pub use atomic::*;
-pub use env::*;
-pub use test::*;
 
 use num_traits::{cast::FromPrimitive, cast::ToPrimitive, Float, FloatConst};
 
@@ -188,4 +188,3 @@ pub fn apply_distortion(s: f32, damt: f32, dist_type: u8) -> f32 {
         _ => s,
     }
 }
-

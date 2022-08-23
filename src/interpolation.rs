@@ -4,8 +4,8 @@
 
 //! Various interpolation related functions.
 
-use crate::{Flt, f};
 use crate::tanh_approx_drive;
+use crate::{f, Flt};
 
 /// Linear crossfade.
 ///
@@ -164,4 +164,3 @@ pub fn cubic_interpolate<F: Flt>(data: &[F], len: usize, index: usize, fract: F)
 
     res
 }
-

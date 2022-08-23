@@ -4,7 +4,6 @@
 
 //! Random number generators and utilities.
 /// Be aware that some might need some initialization function!
-
 use std::cell::RefCell;
 
 /// A wavetable filled entirely with white noise.
@@ -175,4 +174,3 @@ impl SplitMix64 {
         u64_to_open01(self.next_u64())
     }
 }
-
