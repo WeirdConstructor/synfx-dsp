@@ -2,7 +2,7 @@
 // This file is a part of HexoDSP. Released under GPL-3.0-or-later.
 // See README.md and COPYING for details.
 
-mod common;
+use synfx_dsp::assert_vec_feq;
 
 #[test]
 fn check_delaybuffer_linear_interpolation() {

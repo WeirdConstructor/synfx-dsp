@@ -38,6 +38,7 @@ mod filters;
 mod dattorro;
 mod atomic;
 mod env;
+mod test;
 
 pub use approx::*;
 pub use biquad::{Biquad, BiquadCoefs};
@@ -53,6 +54,7 @@ pub use filters::*;
 pub use dattorro::{DattorroReverb, DattorroReverbParams};
 pub use atomic::*;
 pub use env::*;
+pub use test::*;
 
 use num_traits::{cast::FromPrimitive, cast::ToPrimitive, Float, FloatConst};
 

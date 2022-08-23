@@ -3,6 +3,10 @@
 
 * Feature: Added `GateSignal` for generating gate signals of a specified length in
 milliseconds.
+* Feature: Added some macros useful for testing DSP code, like `assert_vec_feq`, `assert_decimated_feq`,
+`assert_decimated_slope_feq` and some others.
+* Feature: Added envelope toolkit in the `synfx_dsp::env` module. You can piece together your
+own envelope using a few macros such as `env_target_stage`, `env_hold_stage` and `env_sustain_stage`.
 
 0.5.2 (2022-08-06)
 ==================
