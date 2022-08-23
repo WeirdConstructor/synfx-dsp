@@ -1,4 +1,4 @@
-0.5.3 (unreleased)
+0.5.3 (2022-08-23)
 ==================
 
 * Feature: Added `GateSignal` for generating gate signals of a specified length in
