@@ -12,8 +12,6 @@ See also:
 - [env_sustain_stage] for a sustain stage piece
 */
 
-use crate::TRIG_LOW_THRES;
-
 /// Envelope state structure for the macros [env_hold_stage], [env_target_stage] and [env_sustain_stage].
 ///
 ///```
@@ -108,7 +106,7 @@ macro_rules! env_target_stage {
     };
 }
 
-/// Holds the previous `state.current` value until `$gate` drops below [TRIG_LOW_THRES].
+/// Holds the previous `state.current` value until `$gate` drops below [crate::TRIG_LOW_THRES].
 ///
 /// See also [EnvState] about the first argument `$state`.
 /// `$stage_idx` is `$stage_idx + 1` after this stage is finished.
@@ -116,7 +114,7 @@ macro_rules! env_target_stage {
 macro_rules! env_sustain_stage {
     ($state: expr, $stage_idx: expr, $sustain_value: expr, $gate: expr, $else: block) => {
         if $state.stage == $stage_idx {
-            if $gate < TRIG_LOW_THRES {
+            if $gate < $crate::TRIG_LOW_THRES {
                 $state.stage += 1;
             }
 
