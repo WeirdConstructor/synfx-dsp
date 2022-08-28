@@ -1,3 +1,8 @@
+0.5.4 (2022-08-28)
+==================
+
+* Bugfix: `env_sustain_stage` referenced `TRIG_LOW_THRES` without any proper crate prefix.
+
 0.5.3 (2022-08-23)
 ==================
 
