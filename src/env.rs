@@ -23,6 +23,7 @@ See also:
 /// let hold_ms = 2.0;
 /// let delay_ms = 2.0;
 ///
+/// state.trigger();
 /// let mut env_samples = vec![];
 /// for _ in 0..(((48000.0 * (attack_ms + hold_ms + delay_ms)) / 1000.0) as usize) {
 ///     env_target_stage!(state, 0, attack_ms, 1.0, |x| x, {
@@ -35,6 +36,7 @@ See also:
 ///
 /// assert_decimated_slope_feq!(env_samples[0..48], 4, vec![0.02083; 100]);
 ///```
+#[derive(Debug, Clone)]
 pub struct EnvState {
     pub srate_ms: f32,
     pub stage: u32,
@@ -46,11 +48,34 @@ pub struct EnvState {
 impl EnvState {
     /// Create a new envelope state structure.
     pub fn new() -> Self {
-        Self { srate_ms: 44100.0 / 1000.0, stage: 0, phase: 0.0, start: 0.0, current: 0.0 }
+        Self { srate_ms: 44100.0 / 1000.0, stage: std::u32::MAX, phase: 0.0, start: 0.0, current: 0.0 }
     }
 
+    #[inline]
     pub fn set_sample_rate(&mut self, srate: f32) {
         self.srate_ms = srate / 1000.0;
+    }
+
+    #[inline]
+    pub fn trigger(&mut self) {
+        self.stage = 0;
+    }
+
+    #[inline]
+    pub fn is_running(&self) -> bool {
+        self.stage != std::u32::MAX
+    }
+
+    #[inline]
+    pub fn stop_immediately(&mut self) {
+        self.stage = std::u32::MAX;
+    }
+
+    pub fn reset(&mut self) {
+        self.stage = std::u32::MAX;
+        self.phase = 0.0;
+        self.start = 0.0;
+        self.current = 0.0;
     }
 }
 
@@ -131,6 +156,7 @@ mod test {
     #[test]
     fn check_hold_stage() {
         let mut state = EnvState::new();
+        state.trigger();
 
         state.current = 0.6;
         for _ in 0..88 {
@@ -148,6 +174,7 @@ mod test {
     #[test]
     fn check_target_stage() {
         let mut state = EnvState::new();
+        state.trigger();
 
         for _ in 0..88 {
             env_target_stage!(state, 0, 2.0, 0.6, |x| x, {});
@@ -164,6 +191,7 @@ mod test {
     #[test]
     fn check_very_short_target_stage() {
         let mut state = EnvState::new();
+        state.trigger();
 
         env_target_stage!(state, 0, 0.01, 0.6, |x| x, {});
         assert!(state.stage == 2);
@@ -174,6 +202,7 @@ mod test {
     #[test]
     fn check_short_target_stage() {
         let mut state = EnvState::new();
+        state.trigger();
 
         env_target_stage!(state, 0, 0.03, 0.6, |x| x, {});
         println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
@@ -189,6 +218,7 @@ mod test {
     #[test]
     fn check_sustain_stage() {
         let mut state = EnvState::new();
+        state.trigger();
 
         env_sustain_stage!(state, 0, 0.5, 1.0, {});
         println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
@@ -209,6 +239,7 @@ mod test {
     #[test]
     fn check_sustain_stage_short() {
         let mut state = EnvState::new();
+        state.trigger();
 
         env_sustain_stage!(state, 0, 0.5, 0.0, {});
         println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
@@ -220,6 +251,7 @@ mod test {
     fn check_ahd_env() {
         let mut state = EnvState::new();
         state.set_sample_rate(48000.0);
+        state.trigger();
 
         let attack_ms = 1.0;
         let hold_ms = 2.0;
