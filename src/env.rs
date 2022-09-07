@@ -105,6 +105,9 @@ macro_rules! env_hold_stage {
 
 /// Increases/Decreases `state.current` value until you are at `$value` within `$time_ms`.
 ///
+/// This envelope part is great for a release stage. Or an fixed time attack stage.
+/// See also [env_target_stage_lin_time_adj].
+///
 /// See also [EnvState] about the first argument `$state`.
 /// `$shape_fn` can be used to shape the line of this envelope stage. Use `|x| x` for a linear envelope.
 /// `$stage_idx` is `$stage_idx + 2` after this stage is finished.
@@ -118,7 +121,40 @@ macro_rules! env_target_stage {
                 $state.stage += 1;
             }
 
-            let inc = 1.0 / ($time_ms * $state.srate_ms);
+            let inc = 1.0 / ($time_ms * $state.srate_ms).max(1.0);
+            $state.phase += inc;
+            if $state.phase >= 1.0 {
+                $state.stage += 1;
+                $state.current = $value;
+            } else {
+                let phase_shped = ($shape_fn)($state.phase);
+                $state.current = $state.start * (1.0 - phase_shped) + phase_shped * $value;
+            }
+        } else $else
+    };
+}
+
+/// Increases/Decreases `state.current` value until you are at `$value` within an adjusted `$time_ms`.
+/// Depending on how close `state.start` is to `$value`, `$time_ms` is linearily shortened.
+/// For this to work, you need to supply the supposed starting value of the envelope.
+///
+/// This envelope part is great for a retriggerable attack stage.
+///
+/// See also [EnvState] about the first argument `$state`.
+/// `$shape_fn` can be used to shape the line of this envelope stage. Use `|x| x` for a linear envelope.
+/// `$stage_idx` is `$stage_idx + 2` after this stage is finished.
+#[macro_export]
+macro_rules! env_target_stage_lin_time_adj {
+    ($state: expr, $stage_idx: expr, $time_ms: expr, $src_value: expr, $value: expr, $shape_fn: expr, $else: block) => {
+        if $state.stage == $stage_idx || $state.stage == ($stage_idx + 1) {
+            if $state.stage == $stage_idx {
+                $state.phase = 0.0;
+                $state.start = $state.current;
+                $state.stage += 1;
+            }
+
+            let time_adj_factor = 1.0 - ($state.start - $src_value) / ($value - $src_value);
+            let inc = 1.0 / (time_adj_factor * $time_ms * $state.srate_ms).max(1.0);
             $state.phase += inc;
             if $state.phase >= 1.0 {
                 $state.stage += 1;
@@ -213,6 +249,57 @@ mod test {
         println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
         assert!(state.stage == 2);
         assert!(state.current == 0.6);
+    }
+
+    #[test]
+    fn check_target_adj_stage() {
+        let mut state = EnvState::new();
+        state.trigger();
+
+        state.current = 0.0;
+
+        for _ in 0..88 {
+            env_target_stage_lin_time_adj!(state, 0, 2.0, 0.0, 0.6, |x| x, {});
+            println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
+            assert!(state.stage == 1);
+        }
+
+        env_target_stage_lin_time_adj!(state, 0, 2.0, 0.0, 0.6, |x| x, {});
+        assert!(state.stage == 2);
+        println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
+        assert!(state.current >= 0.5999);
+    }
+
+    #[test]
+    fn check_target_adj_stage_shortened() {
+        let mut state = EnvState::new();
+        state.trigger();
+
+        state.current = 0.3;
+
+        for _ in 0..44 {
+            env_target_stage_lin_time_adj!(state, 0, 2.0, 0.0, 0.6, |x| x, {});
+            println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
+            assert!(state.stage == 1);
+        }
+
+        env_target_stage_lin_time_adj!(state, 0, 2.0, 0.0, 0.6, |x| x, {});
+        assert!(state.stage == 2);
+        println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
+        assert!(state.current >= 0.5999);
+    }
+
+    #[test]
+    fn check_target_adj_stage_none() {
+        let mut state = EnvState::new();
+        state.trigger();
+
+        state.current = 0.6;
+
+        env_target_stage_lin_time_adj!(state, 0, 2.0, 0.0, 0.6, |x| x, {});
+        assert!(state.stage == 2);
+        println!("V[{:6.4} / {}]: {:6.4}", state.phase, state.stage, state.current);
+        assert!(state.current >= 0.5999);
     }
 
     #[test]
