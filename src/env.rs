@@ -138,7 +138,7 @@ macro_rules! env_target_stage {
 /// Depending on how close `state.start` is to `$value`, `$time_ms` is linearily shortened.
 /// For this to work, you need to supply the supposed starting value of the envelope.
 ///
-/// This envelope part is great for a retriggerable attack stage.
+/// This envelope part is great for a retriggerable envelope.
 ///
 /// See also [EnvState] about the first argument `$state`.
 /// `$shape_fn` can be used to shape the line of this envelope stage. Use `|x| x` for a linear envelope.

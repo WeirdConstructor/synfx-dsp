@@ -2,7 +2,7 @@
 ==================
 
 * Feature: `EnvState` got more methods to control the envelope (such as triggering/retriggering).
-* Feature: `env_target_stage_lin_time_adj` added, for a retriggerable attack stage.
+* Feature: `env_target_stage_lin_time_adj` added, for a retriggerable envelope.
 
 0.5.4 (2022-08-28)
 ==================
