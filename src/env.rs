@@ -7,12 +7,17 @@
 See also:
 
 - [EnvState] which holds the state of the envelope.
-- [env_hold_stage] for a hold stage piece
-- [env_target_stage] for an attack/decay/release stage piece
-- [env_sustain_stage] for a sustain stage piece
+- [EnvRetrigAD] is a complete implementation of an attack decay envelope.
+- [crate::env_hold_stage] for a hold stage piece
+- [crate::env_target_stage] for an attack/decay/release stage piece
+- [crate::env_sustain_stage] for a sustain stage piece
 */
 
-/// Envelope state structure for the macros [env_hold_stage], [env_target_stage] and [env_sustain_stage].
+use crate::sqrt4_to_pow4;
+use crate::{TrigSignal, Trigger};
+
+/// Envelope state structure for the macros [crate::env_hold_stage],
+/// [crate::env_target_stage] and [crate::env_sustain_stage].
 ///
 ///```
 /// use synfx_dsp::{EnvState, env_hold_stage, env_target_stage, assert_decimated_slope_feq};
@@ -48,7 +53,13 @@ pub struct EnvState {
 impl EnvState {
     /// Create a new envelope state structure.
     pub fn new() -> Self {
-        Self { srate_ms: 44100.0 / 1000.0, stage: std::u32::MAX, phase: 0.0, start: 0.0, current: 0.0 }
+        Self {
+            srate_ms: 44100.0 / 1000.0,
+            stage: std::u32::MAX,
+            phase: 0.0,
+            start: 0.0,
+            current: 0.0,
+        }
     }
 
     #[inline]
@@ -106,7 +117,7 @@ macro_rules! env_hold_stage {
 /// Increases/Decreases `state.current` value until you are at `$value` within `$time_ms`.
 ///
 /// This envelope part is great for a release stage. Or an fixed time attack stage.
-/// See also [env_target_stage_lin_time_adj].
+/// See also [crate::env_target_stage_lin_time_adj].
 ///
 /// See also [EnvState] about the first argument `$state`.
 /// `$shape_fn` can be used to shape the line of this envelope stage. Use `|x| x` for a linear envelope.
@@ -184,10 +195,133 @@ macro_rules! env_sustain_stage {
     };
 }
 
+/// A retriggerable AD (Attack & Decay) envelope with modifyable shapes for the attack and decay.
+///
+/// For a more elaborate example see [EnvRetrigAD::tick].
+///
+///```
+/// use synfx_dsp::EnvRetrigAD;
+///
+/// let mut env = EnvRetrigAD::new();
+/// // ..
+/// env.set_sample_rate(44100.0);
+/// // ..
+/// let attack_ms = 3.0;
+/// let decay_ms  = 10.0;
+/// let attack_shape = 0.5; // 0.5 == linear
+/// let decay_shape = 0.5; // 0.5 == linear
+/// let trigger_signal = 0.0; // Raise to 1.0 for trigger.
+///
+/// let (value, retrig) = env.tick(trigger_signal, attack_ms, attack_shape, decay_ms, decay_shape);
+/// // ..
+///```
+///
+/// Note: The code for this envelope is used and tested by the `Ad` node of HexoDSP.
+pub struct EnvRetrigAD {
+    state: EnvState,
+    trig: Trigger,
+    trig_sig: TrigSignal,
+}
+
+impl EnvRetrigAD {
+    /// Creates a new instance of the envelope.
+    pub fn new() -> Self {
+        Self { state: EnvState::new(), trig: Trigger::new(), trig_sig: TrigSignal::new() }
+    }
+
+    /// Set the sample rate of the envelope. Unit in samples per second.
+    pub fn set_sample_rate(&mut self, srate: f32) {
+        self.state.set_sample_rate(srate);
+        self.trig_sig.set_sample_rate(srate);
+    }
+
+    /// Reset the internal state of the envelope.
+    pub fn reset(&mut self) {
+        self.state.reset();
+        self.trig_sig.reset();
+        self.trig.reset();
+    }
+
+    /// Computes the next tick for this envelope.
+    /// The inputs can be changed on each tick.
+    ///
+    /// * `trigger` - Trigger input signal, will trigger like [crate::Trigger].
+    /// * `attack_ms` - The milliseconds for the attack stage.
+    /// * `attack_shape` - The shape for the attack stage.
+    ///   Value in the range [[0.0, 1.0]]. 0.5 is linear. See also [crate::sqrt4_to_pow4].
+    /// * `decay_ms` - The milliseconds for the decay stage.
+    /// * `decay_shape` - The shape for the decay stage.
+    ///   Value in the range [[0.0, 1.0]]. 0.5 is linear. See also [crate::sqrt4_to_pow4].
+    ///
+    /// Returned are two values:
+    /// * First the envelope value
+    /// * Second a trigger signal at the end of the envelope.
+    ///
+    ///```
+    /// use synfx_dsp::EnvRetrigAD;
+    /// let mut env = EnvRetrigAD::new();
+    /// env.set_sample_rate(10.0); // Yes, 10 samples per second for testing here :-)
+    ///
+    /// for _ in 0..2 {
+    ///     env.tick(1.0, 500.0, 0.5, 500.0, 0.5);
+    /// }
+    ///
+    /// let (value, _retrig) = env.tick(1.0, 500.0, 0.5, 500.0, 0.5);
+    /// assert!((value - 0.6).abs() < 0.0001);
+    ///
+    /// for _ in 0..5 {
+    ///     env.tick(1.0, 500.0, 0.5, 500.0, 0.5);
+    /// }
+    ///
+    /// let (value, _retrig) = env.tick(1.0, 500.0, 0.5, 500.0, 0.5);
+    /// assert!((value - 0.2).abs() < 0.0001);
+    ///```
+    #[inline]
+    pub fn tick(
+        &mut self,
+        trigger: f32,
+        attack_ms: f32,
+        attack_shape: f32,
+        decay_ms: f32,
+        decay_shape: f32,
+    ) -> (f32, f32) {
+        if self.trig.check_trigger(trigger) {
+            self.state.trigger();
+        }
+
+        if self.state.is_running() {
+            env_target_stage_lin_time_adj!(
+                self.state,
+                0,
+                attack_ms,
+                0.0,
+                1.0,
+                |x: f32| sqrt4_to_pow4(x.clamp(0.0, 1.0), attack_shape),
+                {
+                    env_target_stage!(
+                        self.state,
+                        2,
+                        decay_ms,
+                        0.0,
+                        |x: f32| sqrt4_to_pow4(x.clamp(0.0, 1.0), decay_shape),
+                        {
+                            self.trig_sig.trigger();
+                            self.state.stop_immediately();
+                        }
+                    );
+                }
+            );
+        }
+
+        (self.state.current, self.trig_sig.next())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::assert_decimated_slope_feq;
+    use crate::assert_vec_feq;
 
     #[test]
     fn check_hold_stage() {
@@ -357,5 +491,59 @@ mod test {
         assert_decimated_slope_feq!(env_samples[0..48], 4, vec![0.02083; 100]);
         assert_decimated_slope_feq!(env_samples[48..146], 4, vec![0.0; 20]);
         assert_decimated_slope_feq!(env_samples[146..240], 4, vec![-0.01041; 40]);
+    }
+
+    #[test]
+    fn check_env_ad() {
+        let mut env = EnvRetrigAD::new();
+
+        env.set_sample_rate(10.0);
+
+        let mut values = vec![];
+        let mut retrig_index = -1;
+        for i in 0..16 {
+            let (value, retrig) = env.tick(1.0, 1000.0, 0.5, 500.0, 0.5);
+            values.push(value);
+            if retrig > 0.0 {
+                retrig_index = i as i32;
+            }
+        }
+
+        assert_vec_feq!(
+            values,
+            vec![
+                0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.70000005, 0.8000001, 0.9000001, 1.0, 0.8, 0.6,
+                0.39999998, 0.19999999, 0.0, 0.0
+            ]
+        );
+
+        assert_eq!(retrig_index, 15);
+    }
+
+    #[test]
+    fn check_env_ad_shaped() {
+        let mut env = EnvRetrigAD::new();
+
+        env.set_sample_rate(10.0);
+
+        let mut values = vec![];
+        let mut retrig_index = -1;
+        for i in 0..16 {
+            let (value, retrig) = env.tick(1.0, 1000.0, 0.7, 500.0, 0.3);
+            values.push(value);
+            if retrig > 0.0 {
+                retrig_index = i as i32;
+            }
+        }
+
+        assert_vec_feq!(
+            values,
+            vec![
+                0.2729822, 0.39777088, 0.49817806, 0.58596444, 0.6656854, 0.7396773, 0.809328,
+                0.8755418, 0.93894666, 1.0, 0.928, 0.79199994, 0.592, 0.32799995, 0.0, 0.0
+            ]
+        );
+
+        assert_eq!(retrig_index, 15);
     }
 }
