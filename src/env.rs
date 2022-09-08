@@ -217,6 +217,7 @@ macro_rules! env_sustain_stage {
 ///```
 ///
 /// Note: The code for this envelope is used and tested by the `Ad` node of HexoDSP.
+#[derive(Debug, Clone)]
 pub struct EnvRetrigAD {
     state: EnvState,
     trig: Trigger,
