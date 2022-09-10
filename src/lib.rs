@@ -282,14 +282,41 @@ pub fn note_to_freq(note: f32) -> f32 {
     440.0 * (2.0_f32).powf((note - 69.0) / 12.0)
 }
 
-/// ```text
-/// gain: 24.0 - -90.0   default = 0.0
+/// Converts gain in decibels to a factor/coeffient
+///
 /// ```
-pub fn gain2coef(gain: f32) -> f32 {
-    if gain > -90.0 {
-        10.0_f32.powf(gain * 0.05)
+/// use synfx_dsp::gain_db2coef;
+///
+/// assert!((gain_db2coef(-6.0) - 0.501187).abs() < 0.00001);
+/// assert!((gain_db2coef(-3.0) - 0.707945).abs() < 0.00001);
+/// assert!((gain_db2coef(0.0) - 1.0).abs() < 0.00001);
+/// assert!((gain_db2coef(6.0) - 1.99526).abs() < 0.00001);
+/// ```
+#[inline]
+pub fn gain_db2coef(gain_db: f32) -> f32 {
+    if gain_db > -90.0 {
+        10.0_f32.powf(gain_db * 0.05)
     } else {
         0.0
+    }
+}
+
+/// Converts a coefficient/factor to decibels
+///
+///```
+/// use synfx_dsp::coef2gain_db;
+///
+/// assert!((coef2gain_db(0.501187) - -6.0).abs() < 0.0001);
+/// assert!((coef2gain_db(0.707945) - -3.0).abs() < 0.0001);
+/// assert!(coef2gain_db(1.0).abs() < 0.00001);
+/// assert!((coef2gain_db(1.99526) - 6.0).abs() < 0.0001);
+///```
+#[inline]
+pub fn coef2gain_db(coef: f32) -> f32 {
+    if coef < 0.0000317 {
+        -90.0
+    } else {
+        20.0 * coef.log10()
     }
 }
 
