@@ -69,3 +69,14 @@ pub fn tanh_levien(x: f32x4) -> f32x4 {
     // println!("a: {:?}, b: {:?}", a, b);
     a / (f32x4::splat(1.0) + (a * a)).sqrt()
 }
+
+/// Another tanh approximation. See also [tanh_levien].
+#[inline(always)]
+pub fn tanh_levien_f64(x: f64) -> f64 {
+    let x2 = x * x;
+    let x3 = x2 * x;
+    let x5 = x3 * x2;
+    let a = x + (0.16489087 * x3) + (0.00985468 * x5);
+    a / (1.0 + (a * a)).sqrt()
+}
+

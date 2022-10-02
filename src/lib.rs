@@ -210,6 +210,7 @@ mod biquad;
 mod dattorro;
 mod delay;
 mod env;
+pub mod fh_va;
 mod filters;
 mod interpolation;
 mod low_freq;

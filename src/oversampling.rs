@@ -151,7 +151,7 @@ impl AllpassCascade {
 }
 
 /// This is a polyphase iir halfband filter (cutoff at fs/4) consisting of cascades of allpasses.
-/// translated from the freely available source code at https://www.musicdsp.org/en/latest/Filters/39-polyphase-filters.html
+/// translated from the freely available source code at <https://www.musicdsp.org/en/latest/Filters/39-polyphase-filters.html>
 ///
 /// Usage:
 ///```

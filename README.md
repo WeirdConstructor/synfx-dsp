@@ -209,4 +209,10 @@ Here is a list of sources parts of this library copied or translated code from:
     originally translated from the freely available source code
     at https://www.musicdsp.org/en/latest/Filters/39-polyphase-filters.html
     ```
+- [crate::fh_va::LadderFilter] / [crate::fh_va::Svf] / [crate::fh_va::SallenKey]
+    ```text
+    Taken from va-filter by Fredemus aka Frederik Halkjær aka RocketPhysician
+    https://github.com/Fredemus/va-filter
+    Under License GPL-3.0-or-later
+    ```
 License: GPL-3.0-or-later
