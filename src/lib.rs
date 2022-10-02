@@ -202,6 +202,8 @@ Here is a list of sources parts of this library copied or translated code from:
     ```
 */
 
+#![feature(portable_simd)]
+
 mod approx;
 mod atomic;
 mod biquad;
@@ -229,6 +231,7 @@ pub use interpolation::*;
 pub use low_freq::*;
 pub use oscillators::*;
 pub use oversampling::Oversampling;
+pub use oversampling::PolyIIRHalfbandFilter;
 pub use rand::*;
 pub use test::*;
 pub use trig_clock::*;
@@ -294,10 +297,10 @@ pub fn note_to_freq(note: f32) -> f32 {
 /// ```
 #[inline]
 pub fn gain_db2coef(gain_db: f32) -> f32 {
-    if gain_db > -90.0 {
-        10.0_f32.powf(gain_db * 0.05)
-    } else {
+    if gain_db < -89.9 {
         0.0
+    } else {
+        10.0_f32.powf(gain_db * 0.05)
     }
 }
 

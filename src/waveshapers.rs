@@ -4,6 +4,9 @@
 
 //! A collection of wave shaping functions.
 
+use std::simd::f32x4;
+use std::simd::StdFloat;
+
 // Ported from LMMS under GPLv2
 // * DspEffectLibrary.h - library with template-based inline-effects
 // * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -48,4 +51,21 @@ pub fn f_fold_distort(gain: f32, threshold: f32, i: f32) -> f32 {
     } else {
         gain * i
     }
+}
+
+/// Cheap 4 channel tanh to make the filter faster.
+// Taken from va-filter by Fredemus aka Frederik Halkjær aka RocketPhysician
+// https://github.com/Fredemus/va-filter
+// Under License GPL-3.0-or-later
+//
+// from a quick look it looks extremely good, max error of ~0.0002 or .02%
+// the error of 1 - tanh_levien^2 as the derivative is about .06%
+#[inline]
+pub fn tanh_levien(x: f32x4) -> f32x4 {
+    let x2 = x * x;
+    let x3 = x2 * x;
+    let x5 = x3 * x2;
+    let a = x + (f32x4::splat(0.16489087) * x3) + (f32x4::splat(0.00985468) * x5);
+    // println!("a: {:?}, b: {:?}", a, b);
+    a / (f32x4::splat(1.0) + (a * a)).sqrt()
 }
