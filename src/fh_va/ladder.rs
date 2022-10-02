@@ -7,8 +7,6 @@
 // Copied under GPL-3.0-or-later from https://github.com/Fredemus/va-filter
 
 use crate::fh_va::FilterParams;
-// use packed_simd::f32x4;
-//use std::simd::StdFloat;
 use std::simd::*;
 use std::rc::Rc;
 
@@ -111,7 +109,7 @@ impl LadderFilter {
         self.vout[self.params.slope as usize]
     }
     // linear version without distortion
-    pub fn run_filter_linear(&mut self, input: f32x4) -> f32x4 {
+    fn run_filter_linear(&mut self, input: f32x4) -> f32x4 {
         // denominators of solutions of individual stages. Simplifies the math a bit
         let g = f32x4::splat(self.params.g);
         let k = f32x4::splat(self.params.k_ladder);
@@ -130,7 +128,7 @@ impl LadderFilter {
         self.vout[2] = g0 * (g * self.vout[1] + self.s[2]);
         self.vout[self.params.slope as usize]
     }
-    pub fn run_filter_newton(&mut self, input: f32x4) -> f32x4 {
+    fn run_filter_newton(&mut self, input: f32x4) -> f32x4 {
         // ---------- setup ----------
         // load in g and k from parameters
         let g = f32x4::splat(self.params.g);
@@ -202,7 +200,7 @@ impl LadderFilter {
         self.vout = v_est;
         self.vout[self.params.slope as usize]
     }
-    // performs a complete filter process (newton-raphson method)
+    /// performs a complete filter process (newton-raphson method)
     pub fn tick_newton(&mut self, input: f32x4) -> f32x4 {
         // perform filter process
         let out = self.run_filter_newton(input * f32x4::splat(self.params.drive));
@@ -210,7 +208,7 @@ impl LadderFilter {
         self.update_state();
         out * f32x4::splat((1. + self.params.k_ladder) / (self.params.drive * 0.5))
     }
-    /// performs a complete filter process (newton-raphson method)
+    /// performs a complete filter process (solved with Mystran's fixed-pivot method).
     pub fn tick_pivotal(&mut self, input: f32x4) -> f32x4 {
         // perform filter process
         let out = self.run_filter_pivotal(input * f32x4::splat(self.params.drive));
