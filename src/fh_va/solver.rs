@@ -17,7 +17,7 @@ pub fn safe_asinh(x: f64) -> f64 {
 /// Provides the data structures and methods to solve the nonlinear contributions in the filter models using Newton's method
 /// Requires the filter model to implement a method for evaluating the nonlinearities themself
 /// since I didn't want to deal with passing functions into the new() method
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct DKSolver<const N_N: usize, const N_P: usize, const P_LEN: usize> {
     // current solution of nonlinear contributions
     pub z: [f64; N_N],

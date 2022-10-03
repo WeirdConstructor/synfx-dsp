@@ -33,6 +33,7 @@ enum EstimateSource {
 ///
 /// Circuit solved by applying KCL, finding the jacobian of the entire system
 /// and then applying newton's method.
+#[derive(Debug, Clone)]
 pub struct LadderFilter {
     pub params: Rc<FilterParams>,
 
@@ -43,6 +44,9 @@ pub struct LadderFilter {
 impl LadderFilter {
     pub fn new(params: Rc<FilterParams>) -> Self {
         Self { params, vout: [f32x4::splat(0.); 4], s: [f32x4::splat(0.); 4] }
+    }
+    pub fn reset(&mut self) {
+        self.s = [f32x4::splat(0.); 4];
     }
     fn get_estimate(&mut self, n: usize, estimate: EstimateSource, input: f32x4) -> f32x4 {
         // if we ask for an estimate based on the linear filter, we have to run it

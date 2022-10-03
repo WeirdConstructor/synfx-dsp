@@ -44,6 +44,7 @@ const TOL: f64 = 1e-5;
 /// compare, since most of the operations are dot products anyway, but the
 /// current fast version is definitely fast enough for real-time use in DAW
 /// projects.  pub struct SallenKey { filters: [SallenKeyCoreFast; 2], }
+#[derive(Debug, Clone)]
 pub struct SallenKey {
     filters: [SallenKeyCoreFast; 2],
 }
@@ -359,6 +360,7 @@ const N_P2: usize = 2;
 const N_N2: usize = 3;
 const P_LEN2: usize = 6;
 /// this does the same as `SallenKeyCore`, but with most equations simplified to make it faster
+#[derive(Debug, Clone)]
 struct SallenKeyCoreFast {
     pub params: Rc<FilterParams>,
     pub vout: [f32; N_OUTS],

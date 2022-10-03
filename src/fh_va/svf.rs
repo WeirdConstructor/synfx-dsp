@@ -48,6 +48,7 @@ use std::rc::Rc;
 /// projects.  Sadly convergence varies too much for using simd-lanes for
 /// processing left and right at the same time to bring a big performance
 /// benefit.
+#[derive(Debug, Clone)]
 pub struct Svf {
     filters: [SvfCoreFast; 2],
 }
@@ -388,6 +389,7 @@ const TOL: f64 = 1e-5;
 //    }
 //}
 //
+#[derive(Debug, Clone)]
 pub struct SvfCoreFast {
     pub params: Rc<FilterParams>,
     pub vout: [f32; N_OUTS],

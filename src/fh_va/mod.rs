@@ -20,7 +20,7 @@ pub use sallen_key::SallenKey;
 pub use svf::Svf;
 
 /// The SVF filter mode (LP, HP, BP1, Notch, BP2)
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SvfMode {
     LP,
     HP,
@@ -30,7 +30,7 @@ pub enum SvfMode {
 }
 
 /// The Ladder filter slope 6dB to 24dB.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LadderSlope {
     LP6,
     LP12,
@@ -38,6 +38,7 @@ pub enum LadderSlope {
     LP24,
 }
 
+#[derive(Debug, Clone)]
 /// Filter parameters for the filters [crate::fh_va::Svf], [crate::fh_va::SallenKey] and [crate::fh_va::LadderFilter].
 pub struct FilterParams {
     /// Cutoff frequency 5.0 Hz to 20 kHz.
