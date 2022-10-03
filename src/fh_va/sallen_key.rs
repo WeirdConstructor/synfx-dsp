@@ -10,7 +10,7 @@ use crate::{fh_va::DKSolver, fh_va::FilterParams};
 // use packed_simd::f32x4;
 // use core_simd::*;
 // use std_float::*;
-use std::rc::Rc;
+use std::sync::Arc;
 
 const N_P: usize = 2;
 const N_N: usize = 4;
@@ -50,7 +50,7 @@ pub struct SallenKey {
 }
 
 impl SallenKey {
-    pub fn new(params: Rc<FilterParams>) -> Self {
+    pub fn new(params: Arc<FilterParams>) -> Self {
         Self { filters: [SallenKeyCoreFast::new(params.clone()), SallenKeyCoreFast::new(params)] }
     }
     /// Process a stereo sample.
@@ -69,7 +69,7 @@ impl SallenKey {
     }
 }
 //pub struct SallenKeyCore {
-//    pub params: Rc<FilterParams>,
+//    pub params: Arc<FilterParams>,
 //    pub vout: [f32; N_OUTS],
 //    pub s: [f32; N_STATES],
 //
@@ -95,7 +95,7 @@ impl SallenKey {
 //}
 //// here we flatten a bunch of stuff to hopefully make it faster
 //impl SallenKeyCore {
-//    pub fn new(params: Rc<FilterParams>) -> Self {
+//    pub fn new(params: Arc<FilterParams>) -> Self {
 //        // TODO: pass in proper params
 //        let fs = params.sample_rate;
 //        let g = (std::f32::consts::PI * 1000. / (fs as f32)).tan();
@@ -362,7 +362,7 @@ const P_LEN2: usize = 6;
 /// this does the same as `SallenKeyCore`, but with most equations simplified to make it faster
 #[derive(Debug, Clone)]
 struct SallenKeyCoreFast {
-    pub params: Rc<FilterParams>,
+    pub params: Arc<FilterParams>,
     pub vout: [f32; N_OUTS],
     pub s: [f32; N_STATES],
 
@@ -390,7 +390,7 @@ struct SallenKeyCoreFast {
 }
 // here we flatten a bunch of stuff to hopefully make it faster
 impl SallenKeyCoreFast {
-    pub fn new(params: Rc<FilterParams>) -> Self {
+    pub fn new(params: Arc<FilterParams>) -> Self {
         let fs = params.sample_rate;
         let g = (std::f32::consts::PI * 1000. / (fs as f32)).tan();
         let res = 0.1;

@@ -9,7 +9,7 @@
 use crate::fh_va::{DKSolver, FilterParams, SvfMode};
 use std::f32::consts::{FRAC_1_SQRT_2, SQRT_2};
 use std::f64::consts::{FRAC_1_SQRT_2 as FRAC_1_SQRT_2_F64, SQRT_2 as SQRT_2_F64};
-use std::rc::Rc;
+use std::sync::Arc;
 
 /// This is a 2-pole multimode filter.
 ///
@@ -54,7 +54,7 @@ pub struct Svf {
 }
 
 impl Svf {
-    pub fn new(params: Rc<FilterParams>) -> Self {
+    pub fn new(params: Arc<FilterParams>) -> Self {
         Self { filters: [SvfCoreFast::new(params.clone()), SvfCoreFast::new(params)] }
     }
     /// Process a stereo sample.
@@ -81,7 +81,7 @@ const N_STATES: usize = 2;
 const TOL: f64 = 1e-5;
 ///// 2-pole state-variable filter
 //pub struct SvfCore {
-//    pub params: Rc<FilterParams>,
+//    pub params: Arc<FilterParams>,
 //    pub vout: [f32; N_OUTS],
 //    pub s: [f32; N_STATES],
 //
@@ -107,7 +107,7 @@ const TOL: f64 = 1e-5;
 //}
 //
 //impl SvfCore {
-//    pub fn new(params: Rc<FilterParams>) -> Self {
+//    pub fn new(params: Arc<FilterParams>) -> Self {
 //        let fs = params.sample_rate;
 //        let g = (std::f32::consts::PI * 1000. / (fs as f32)).tan();
 //        let res = 0.1 - 1.;
@@ -391,7 +391,7 @@ const TOL: f64 = 1e-5;
 //
 #[derive(Debug, Clone)]
 pub struct SvfCoreFast {
-    pub params: Rc<FilterParams>,
+    pub params: Arc<FilterParams>,
     pub vout: [f32; N_OUTS],
     pub s: [f32; N_STATES],
 
@@ -406,7 +406,7 @@ pub struct SvfCoreFast {
 }
 
 impl SvfCoreFast {
-    pub fn new(params: Rc<FilterParams>) -> Self {
+    pub fn new(params: Arc<FilterParams>) -> Self {
         let fs = params.sample_rate;
         let g = (std::f32::consts::PI * 1000. / (fs as f32)).tan();
         let res = 0.1;

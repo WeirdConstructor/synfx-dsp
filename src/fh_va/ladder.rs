@@ -8,7 +8,7 @@
 
 use crate::fh_va::FilterParams;
 use std::simd::*;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 #[derive(PartialEq, Clone, Copy)]
@@ -35,14 +35,14 @@ enum EstimateSource {
 /// and then applying newton's method.
 #[derive(Debug, Clone)]
 pub struct LadderFilter {
-    pub params: Rc<FilterParams>,
+    pub params: Arc<FilterParams>,
 
     vout: [f32x4; 4],
     pub s: [f32x4; 4],
 }
 #[allow(dead_code)]
 impl LadderFilter {
-    pub fn new(params: Rc<FilterParams>) -> Self {
+    pub fn new(params: Arc<FilterParams>) -> Self {
         Self { params, vout: [f32x4::splat(0.); 4], s: [f32x4::splat(0.); 4] }
     }
     pub fn reset(&mut self) {
