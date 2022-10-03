@@ -89,7 +89,7 @@ impl<const N: usize> Oversampling<N> {
 // translated from the freely available source code at https://www.musicdsp.org/en/latest/Filters/39-polyphase-filters.html
 // no changes to the algorithm, just some rust-ifying and simple simding for independent samples
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct Allpass {
     a: f32x4,
     x0: f32x4,
@@ -134,7 +134,7 @@ impl Allpass {
         output
     }
 }
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct AllpassCascade {
     allpasses: [Allpass; 6],
     num_filters: usize,
@@ -195,7 +195,7 @@ impl AllpassCascade {
 ///     }
 /// }
 ///```
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct PolyIIRHalfbandFilter {
     filter_a: AllpassCascade,
     filter_b: AllpassCascade,
