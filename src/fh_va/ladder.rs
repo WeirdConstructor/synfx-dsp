@@ -210,7 +210,7 @@ impl LadderFilter {
         let out = self.run_filter_newton(input * f32x4::splat(self.params.drive));
         // update ic1eq and ic2eq for next sample
         self.update_state();
-        out * f32x4::splat((1. + self.params.k_ladder) / (self.params.drive * 0.5))
+        out * f32x4::splat((1. + self.params.k_ladder)) // / (self.params.drive * 0.5))
     }
     /// performs a complete filter process (solved with Mystran's fixed-pivot method).
     pub fn tick_pivotal(&mut self, input: f32x4) -> f32x4 {
