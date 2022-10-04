@@ -25,7 +25,7 @@ enum EstimateSource {
 /// Moog synthesizers. It distorts nicely and is capable of stable
 /// self-oscillation when `k_ladder==4`, and can output other slopes too.
 ///
-/// Resonance is limited by the differential BJT buffers. 
+/// Resonance is limited by the differential BJT buffers.
 ///
 /// It converges very well, usually only taking 2 iterations,
 /// and almost never more than 4. Could just always do 2,
@@ -133,10 +133,15 @@ impl LadderFilter {
         self.vout[self.params.slope as usize]
     }
     fn run_filter_newton(&mut self, input: f32x4) -> f32x4 {
+        //d// println!(
+        //d//     "sr={} cutoff={}, res={}, drive={}",
+        //d//     self.params.sample_rate, self.params.cutoff, self.params.res, self.params.drive
+        //d// );
         // ---------- setup ----------
         // load in g and k from parameters
         let g = f32x4::splat(self.params.g);
         let k = f32x4::splat(self.params.k_ladder);
+        //d// println!("input={:?} G={:?}, K={:?}", input.as_array(), g.as_array(), k.as_array());
         // a[n] is the fixed-pivot approximation for whatever is being processed nonlinearly
         let mut v_est: [f32x4; 4];
         let mut temp: [f32x4; 4] = [f32x4::splat(0.); 4];

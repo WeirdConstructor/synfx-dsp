@@ -89,7 +89,7 @@ impl FilterParams {
         self.res = res;
         self.zeta = 5. - 4.9 * res;
 //        self.k_ladder = res.powi(2) * 3.8 - 0.2;
-        self.k_ladder = res.powi(2) * 4.2 - 0.2;
+        self.k_ladder = res.powi(2) * 4.5 - 0.2;
     }
 
     #[inline]
