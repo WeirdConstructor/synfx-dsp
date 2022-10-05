@@ -11,6 +11,7 @@ use crate::{fh_va::DKSolver, fh_va::FilterParams};
 // use core_simd::*;
 // use std_float::*;
 use std::sync::Arc;
+use std::simd::f32x4;
 
 const N_P: usize = 2;
 const N_N: usize = 4;
@@ -54,8 +55,13 @@ impl SallenKey {
         Self { filters: [SallenKeyCoreFast::new(params.clone()), SallenKeyCoreFast::new(params)] }
     }
     /// Process a stereo sample.
-    pub fn process(&mut self, input: [f32; 2]) -> [f32; 2] {
-        [self.filters[0].tick_dk(input[0]), self.filters[1].tick_dk(input[1])]
+    pub fn process(&mut self, input: f32x4) -> f32x4 {
+        f32x4::from_array([
+            self.filters[0].tick_dk(input[0]),
+            self.filters[1].tick_dk(input[1]),
+            0.,
+            0.,
+        ])
     }
     /// Call this whenver the resonance or cutoff frequency of the [FilterParams] change.
     pub fn update(&mut self) {
