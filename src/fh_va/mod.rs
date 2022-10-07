@@ -87,7 +87,7 @@ impl FilterParams {
     #[inline]
     pub fn set_resonance(&mut self, res: f32) {
         self.res = res;
-        self.zeta = 5. - 4.9 * res;
+        self.zeta = 5. - 5.0 * res;
 //        self.k_ladder = res.powi(2) * 3.8 - 0.2;
         self.k_ladder = res.powi(2) * 4.5 - 0.2;
     }
