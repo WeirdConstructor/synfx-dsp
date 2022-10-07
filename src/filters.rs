@@ -5,6 +5,7 @@
 //! A collection of filters, ranging from simple one poles to more interesting ones.
 
 use crate::{f, Flt};
+use std::simd::f32x4;
 
 // one pole lp from valley rack free:
 // https://github.com/ValleyAudio/ValleyRackFree/blob/v1.0/src/Common/DSP/OnePoleFilters.cpp
@@ -555,5 +556,45 @@ impl<F: Flt> DCBlockFilter<F> {
         self.xm1 = input;
         self.ym1 = y;
         y as F
+    }
+}
+
+// Taken from va-filter by Fredemus aka Frederik Halkjær aka RocketPhysician
+// https://github.com/Fredemus/va-filter
+// Under License GPL-3.0-or-later
+/// Basic 4 channel SIMD DC-filter from Understanding Digital Signal Processing by Richard Lyons.
+#[derive(Debug, Clone)]
+pub struct DCFilterX4 {
+    y0: f32x4,
+    x0: f32x4,
+    /// higher alpha moves the cutoff lower, but also makes it settle slower.
+    /// See if it's reasonable to make it higher.
+    alpha: f32x4,
+}
+
+impl Default for DCFilterX4 {
+    fn default() -> Self {
+        Self {
+            y0: f32x4::splat(0.),
+            x0: f32x4::splat(0.),
+            // alpha: f32x4::splat(0.975),
+            alpha: f32x4::splat(0.9999),
+        }
+    }
+}
+
+impl DCFilterX4 {
+    pub fn process(&mut self, input: f32x4) -> f32x4 {
+        let y_new = input - self.x0 + self.alpha * self.y0;
+        self.x0 = input;
+        self.y0 = y_new;
+
+        y_new
+    }
+
+    pub fn reset(&mut self) {
+        self.y0 = f32x4::splat(0.);
+        self.x0 = f32x4::splat(0.);
+        self.alpha = f32x4::splat(0.9999);
     }
 }

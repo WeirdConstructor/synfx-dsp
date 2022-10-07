@@ -596,7 +596,7 @@ impl SvfCoreFast {
 
         let (res1, jq1) = self.solver.eval_opamp(q[0], q[1]);
         let (res2, jq2) = self.solver.eval_opamp(q[2], q[3]);
-        let (res3, jq3) = self.solver.eval_diodepair(q[4], q[5], 1e-12, 1.28);
+        let (res3, jq3) = self.solver.eval_diodepair(q[4], q[5], 1e-12, 1.48);
 
         self.jq[0] = jq1[0];
         self.jq[2] = jq2[0];
