@@ -318,6 +318,116 @@ impl EnvRetrigAD {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct EnvADSRParams {
+    pub attack_ms: f32,
+    pub attack_shape: f32,
+    pub decay_ms: f32,
+    pub decay_shape: f32,
+    pub sustain: f32,
+    pub release_ms: f32,
+    pub release_shape: f32,
+}
+
+impl Default for EnvADSRParams {
+    fn default() -> Self {
+        Self {
+            attack_ms: 0.0,
+            attack_shape: 0.0,
+            decay_ms: 0.0,
+            decay_shape: 0.0,
+            sustain: 0.0,
+            release_ms: 0.0,
+            release_shape: 0.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct EnvRetrigADSR {
+    state: EnvState,
+    trig: Trigger,
+    trig_sig: TrigSignal,
+}
+
+impl EnvRetrigADSR {
+    /// Creates a new instance of the envelope.
+    pub fn new() -> Self {
+        Self { state: EnvState::new(), trig: Trigger::new(), trig_sig: TrigSignal::new() }
+    }
+
+    /// Set the sample rate of the envelope. Unit in samples per second.
+    pub fn set_sample_rate(&mut self, srate: f32) {
+        self.state.set_sample_rate(srate);
+        self.trig_sig.set_sample_rate(srate);
+    }
+
+    /// Reset the internal state of the envelope.
+    pub fn reset(&mut self) {
+        self.state.reset();
+        self.trig_sig.reset();
+        self.trig.reset();
+    }
+
+    #[inline]
+    pub fn tick(
+        &mut self,
+        gate: f32,
+        params: &mut EnvADSRParams,
+    ) -> (f32, f32) {
+        if self.trig.check_trigger(gate) {
+            self.state.trigger();
+        }
+
+        if self.state.is_running() {
+            // Attack
+            env_target_stage_lin_time_adj!(
+                self.state,
+                0,
+                params.attack_ms,
+                0.0,
+                1.0,
+                |x: f32| sqrt4_to_pow4(x.clamp(0.0, 1.0), params.attack_shape),
+                {
+                    // Decay
+                    env_target_stage!(
+                        self.state,
+                        2,
+                        params.decay_ms,
+                        params.sustain,
+                        |x: f32| sqrt4_to_pow4(x.clamp(0.0, 1.0), params.decay_shape),
+                        {
+                            // Sustain
+                            env_sustain_stage!(
+                                self.state,
+                                4,
+                                params.sustain,
+                                gate,
+                                {
+                                    // Release
+                                    env_target_stage!(
+                                        self.state,
+                                        5,
+                                        params.release_ms,
+                                        0.0,
+                                        |x: f32| sqrt4_to_pow4(x.clamp(0.0, 1.0), params.release_shape),
+                                        {
+                                            self.trig_sig.trigger();
+                                            self.state.stop_immediately();
+                                        }
+                                    );
+                                }
+                            );
+                        }
+                    );
+                }
+            );
+        }
+
+        (self.state.current, self.trig_sig.next())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
