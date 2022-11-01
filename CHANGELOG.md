@@ -1,6 +1,7 @@
-0.5.5 (unreleased)
+0.5.5 (2022-11-01)
 ==================
 
+* Change: Requires nightly Rust due to SIMD features.
 * Feature: `EnvState` got more methods to control the envelope (such as triggering/retriggering).
 * Feature: `env_target_stage_lin_time_adj` added, for a retriggerable envelope.
 * Feature: Added an attack decay envelope implementation with `EnvRetrigAD`.

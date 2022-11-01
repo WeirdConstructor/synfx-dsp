@@ -13,9 +13,9 @@ use crate::{fh_va::DKSolver, fh_va::FilterParams};
 use std::sync::Arc;
 use std::simd::f32x4;
 
-const N_P: usize = 2;
-const N_N: usize = 4;
-const P_LEN: usize = 8;
+//const N_P: usize = 2;
+//const N_N: usize = 4;
+//const P_LEN: usize = 8;
 const N_OUTS: usize = 1;
 const N_STATES: usize = 2;
 const TOL: f64 = 1e-5;

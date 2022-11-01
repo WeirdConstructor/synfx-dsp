@@ -7,8 +7,6 @@
 // Copied under GPL-3.0-or-later from https://github.com/Fredemus/va-filter
 
 use crate::fh_va::{DKSolver, FilterParams, SvfMode};
-use std::f32::consts::{FRAC_1_SQRT_2, SQRT_2};
-use std::f64::consts::{FRAC_1_SQRT_2 as FRAC_1_SQRT_2_F64, SQRT_2 as SQRT_2_F64};
 use std::sync::Arc;
 use std::simd::f32x4;
 

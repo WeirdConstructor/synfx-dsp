@@ -1,5 +1,6 @@
+#![allow(dead_code)]
 use crate::tanh_levien_f64;
-/// like rust's asinh, but a way that's less prone to overflow by switching to a formula using smaller values
+///// like rust's asinh, but a way that's less prone to overflow by switching to a formula using smaller values
 #[inline]
 pub fn safe_asinh(x: f64) -> f64 {
     const AH_LN2: f64 = 6.93147180559945286227e-01;
