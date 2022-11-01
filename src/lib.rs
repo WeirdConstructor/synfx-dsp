@@ -22,6 +22,8 @@ if they comply with the GPL-3.0-or-later license and don't break the test suite 
 that also has to pass if these algorithms are touched. The flip side is, that these implementations
 are actually covered by a test suite.
 
+**Requires Nightly as of 2022-10-02 due to std::simd!**
+
 Copyright, Licenses, Attribution, Contributions
 ===============================================
 
