@@ -54,8 +54,6 @@ pub fn get_amplitude_response(
 pub fn get_phase_response(
     cutoff: f32,
     k: f32,
-    mode: usize,
-    filter_type: Circuits,
     ladder_mix: [f32; 5],
     len: usize,
 ) -> Vec<f32> {
