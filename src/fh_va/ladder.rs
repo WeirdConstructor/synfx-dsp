@@ -33,21 +33,39 @@ enum EstimateSource {
 ///
 /// Circuit solved by applying KCL, finding the jacobian of the entire system
 /// and then applying newton's method.
+/// 
+/// By mixing the output of the different stages, and the output of the feedback, we can create many other filter types. See `LadderMode`
 #[derive(Debug, Clone)]
 pub struct LadderFilter {
     pub params: Arc<FilterParams>,
 
     vout: [f32x4; 4],
     pub s: [f32x4; 4],
+    mix: [f32x4; 5],
 }
 #[allow(dead_code)]
 impl LadderFilter {
     pub fn new(params: Arc<FilterParams>) -> Self {
-        Self { params, vout: [f32x4::splat(0.); 4], s: [f32x4::splat(0.); 4] }
+        let mut a = Self {
+            params,
+            vout: [f32x4::splat(0.); 4],
+            s: [f32x4::splat(0.); 4],
+            mix: [f32x4::splat(0.); 5],
+        };
+        a.set_mix(LadderMode::Lp24);
+        a
     }
     pub fn reset(&mut self) {
         self.s = [f32x4::splat(0.); 4];
     }
+    pub fn set_mix(&mut self, mode: LadderMode) {
+        let mix = get_ladder_mix(mode);
+
+        for i in 0..self.mix.len() {
+            self.mix[i] = f32x4::splat(mix[i]);
+        }
+    }
+
     fn get_estimate(&mut self, n: usize, estimate: EstimateSource, input: f32x4) -> f32x4 {
         // if we ask for an estimate based on the linear filter, we have to run it
         if estimate == EstimateSource::LinearStateEstimate
@@ -110,7 +128,8 @@ impl LadderFilter {
         self.vout[1] = g1 * (g * a[2] * self.vout[0] + self.s[1]);
         self.vout[2] = g2 * (g * a[3] * self.vout[1] + self.s[2]);
 
-        self.vout[self.params.slope as usize]
+        // self.vout[self.params.slope as usize]
+        self.pole_mix(input - k * self.vout[3])
     }
     // linear version without distortion
     fn run_filter_linear(&mut self, input: f32x4) -> f32x4 {
@@ -130,7 +149,7 @@ impl LadderFilter {
         self.vout[0] = g0 * (g * (input - k * self.vout[3]) + self.s[0]);
         self.vout[1] = g0 * (g * self.vout[0] + self.s[1]);
         self.vout[2] = g0 * (g * self.vout[1] + self.s[2]);
-        self.vout[self.params.slope as usize]
+        self.pole_mix(input - k * self.vout[3])
     }
     fn run_filter_newton(&mut self, input: f32x4) -> f32x4 {
         //d// println!(
@@ -207,7 +226,7 @@ impl LadderFilter {
             // n_iterations += 1;
         }
         self.vout = v_est;
-        self.vout[self.params.slope as usize]
+        self.pole_mix(input - k * self.vout[3])
     }
     /// performs a complete filter process (newton-raphson method)
     pub fn tick_newton(&mut self, input: f32x4) -> f32x4 {
@@ -215,7 +234,7 @@ impl LadderFilter {
         let out = self.run_filter_newton(input * f32x4::splat(self.params.drive));
         // update ic1eq and ic2eq for next sample
         self.update_state();
-        out * f32x4::splat((1. + self.params.k_ladder) / (self.params.drive * 0.5))
+        out
     }
     /// performs a complete filter process (solved with Mystran's fixed-pivot method).
     pub fn tick_pivotal(&mut self, input: f32x4) -> f32x4 {
@@ -234,4 +253,87 @@ impl LadderFilter {
         self.update_state();
         out
     }
+    #[inline(always)]
+    fn pole_mix(&self, input: f32x4) -> f32x4 {
+        let mut sum = self.mix[0] * input;
+        for i in 0..4 {
+            sum += self.mix[i + 1] * self.vout[i];
+        }
+        sum
+    }
 }
+
+#[derive(Debug, PartialEq)]
+pub enum LadderMode {
+    Lp6,
+    Lp12,
+    Lp18,
+    Lp24,
+    Hp6,
+    Hp12,
+    Hp18,
+    Hp24,
+    Bp12,
+    Bp24,
+    N12,
+}
+impl std::fmt::Display for LadderMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            LadderMode::Lp6 => write!(f, "Lp6"),
+            LadderMode::Lp12 => write!(f, "Lp12"),
+            LadderMode::Lp18 => write!(f, "Lp18"),
+            LadderMode::Lp24 => write!(f, "Lp24"),
+            LadderMode::Hp6 => write!(f, "Hp6"),
+            LadderMode::Hp12 => write!(f, "Hp12"),
+            LadderMode::Hp18 => write!(f, "Hp18"),
+            LadderMode::Hp24 => write!(f, "Hp24"),
+            LadderMode::Bp12 => write!(f, "Bp12"),
+            LadderMode::Bp24 => write!(f, "Bp24"),
+            LadderMode::N12 => write!(f, "N12"),
+        }
+    }
+}
+pub fn get_ladder_mix(mode: LadderMode) -> [f32; 5] {
+    let mix;
+    match mode {
+        LadderMode::Lp6 => {
+            mix = [0., -1., 0., -0., 0.];
+        }
+        LadderMode::Lp12 => {
+            mix = [0., -0., 1., -0., 0.];
+        }
+        LadderMode::Lp18 => {
+            mix = [0., -0., 0., -1., 0.];
+        }
+        LadderMode::Lp24 => {
+            mix = [0., -0., 0., -0., 1.];
+        }
+        LadderMode::Hp6 => {
+            mix = [1., -1., 0., -0., 0.];
+        }
+        LadderMode::Hp12 => {
+            mix = [1., -2., 1., -0., 0.];
+        }
+        LadderMode::Hp18 => {
+            mix = [1., -3., 3., -1., 0.];
+        }
+        LadderMode::Hp24 => {
+            mix = [1., -4., 6., -4., 1.];
+        }
+        LadderMode::Bp12 => {
+            mix = [0., -1., 1., -0., 0.];
+        }
+        LadderMode::Bp24 => {
+            mix = [0., -0., 1., -2., 1.];
+        } 
+        LadderMode::N12 => {
+            mix = [1., -2., 2., -0., 0.];
+
+        },
+          
+    }
+    mix
+}
+
+
