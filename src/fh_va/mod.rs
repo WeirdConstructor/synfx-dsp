@@ -88,7 +88,7 @@ impl FilterParams {
     pub fn set_resonance(&mut self, res: f32) {
         self.res = res;
         self.zeta = 5. - 5.0 * res;
-//        self.k_ladder = res.powi(2) * 3.8 - 0.2;
+        //        self.k_ladder = res.powi(2) * 3.8 - 0.2;
         self.k_ladder = res.powi(2) * 4.5 - 0.2;
     }
 
@@ -104,4 +104,77 @@ impl FilterParams {
         self.set_resonance(self.res);
         self.set_frequency(self.cutoff);
     }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum LadderMode {
+    Lp6,
+    Lp12,
+    Lp18,
+    Lp24,
+    Hp6,
+    Hp12,
+    Hp18,
+    Hp24,
+    Bp12,
+    Bp24,
+    N12,
+}
+impl std::fmt::Display for LadderMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            LadderMode::Lp6 => write!(f, "Lp6"),
+            LadderMode::Lp12 => write!(f, "Lp12"),
+            LadderMode::Lp18 => write!(f, "Lp18"),
+            LadderMode::Lp24 => write!(f, "Lp24"),
+            LadderMode::Hp6 => write!(f, "Hp6"),
+            LadderMode::Hp12 => write!(f, "Hp12"),
+            LadderMode::Hp18 => write!(f, "Hp18"),
+            LadderMode::Hp24 => write!(f, "Hp24"),
+            LadderMode::Bp12 => write!(f, "Bp12"),
+            LadderMode::Bp24 => write!(f, "Bp24"),
+            LadderMode::N12 => write!(f, "N12"),
+        }
+    }
+}
+pub fn get_ladder_mix(mode: LadderMode) -> [f32; 5] {
+    let mix;
+    match mode {
+        LadderMode::Lp6 => {
+            mix = [0., -1., 0., -0., 0.];
+        }
+        LadderMode::Lp12 => {
+            mix = [0., -0., 1., -0., 0.];
+        }
+        LadderMode::Lp18 => {
+            mix = [0., -0., 0., -1., 0.];
+        }
+        LadderMode::Lp24 => {
+            mix = [0., -0., 0., -0., 1.];
+        }
+        LadderMode::Hp6 => {
+            mix = [1., -1., 0., -0., 0.];
+        }
+        LadderMode::Hp12 => {
+            mix = [1., -2., 1., -0., 0.];
+        }
+        LadderMode::Hp18 => {
+            mix = [1., -3., 3., -1., 0.];
+        }
+        LadderMode::Hp24 => {
+            mix = [1., -4., 6., -4., 1.];
+        }
+        LadderMode::Bp12 => {
+            mix = [0., -1., 1., -0., 0.];
+        }
+        LadderMode::Bp24 => {
+            mix = [0., -0., 1., -2., 1.];
+        } 
+        LadderMode::N12 => {
+            mix = [1., -2., 2., -0., 0.];
+
+        },
+          
+    }
+    mix
 }
