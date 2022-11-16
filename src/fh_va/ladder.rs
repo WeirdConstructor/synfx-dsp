@@ -54,7 +54,7 @@ impl LadderFilter {
             s: [f32x4::splat(0.); 4],
             mix: [f32x4::splat(0.); 5],
         };
-        a.set_mix(LadderMode::Lp24);
+        a.set_mix(LadderMode::LP6);
         a
     }
     pub fn reset(&mut self) {
@@ -130,7 +130,6 @@ impl LadderFilter {
         self.vout[1] = g1 * (g * a[2] * self.vout[0] + self.s[1]);
         self.vout[2] = g2 * (g * a[3] * self.vout[1] + self.s[2]);
 
-        // self.vout[self.params.slope as usize]
         self.pole_mix(input - k * self.vout[3])
     }
     // linear version without distortion

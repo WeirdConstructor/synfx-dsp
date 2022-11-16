@@ -29,15 +29,6 @@ pub enum SvfMode {
     BP2,
 }
 
-/// The Ladder filter slope 6dB to 24dB.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LadderSlope {
-    LP6,
-    LP12,
-    LP18,
-    LP24,
-}
-
 #[derive(Debug, Clone)]
 /// Filter parameters for the filters [crate::fh_va::Svf], [crate::fh_va::SallenKey] and [crate::fh_va::LadderFilter].
 pub struct FilterParams {
@@ -50,8 +41,8 @@ pub struct FilterParams {
 
     /// The SVF filter mode.
     pub mode: SvfMode,
-    /// The ladder filter slope (6dB to 24dB)
-    pub slope: LadderSlope,
+    /// The Ladder filter mode.
+    pub ladder_mode: LadderMode,
 
     /// Calculated by the [FilterParams::set_frequency] function.
     pub g: f32,
@@ -71,7 +62,7 @@ impl FilterParams {
             drive: 1.0,
 
             mode: SvfMode::LP,
-            slope: LadderSlope::LP6,
+            ladder_mode: LadderMode::LP6,
 
             g: 0.0,
             sample_rate: 0.0,
@@ -106,75 +97,75 @@ impl FilterParams {
     }
 }
 
-#[derive(Debug, PartialEq)]
+/// The Ladder mode, You can choose between low pass, high pass, band pass and notch.
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum LadderMode {
-    Lp6,
-    Lp12,
-    Lp18,
-    Lp24,
-    Hp6,
-    Hp12,
-    Hp18,
-    Hp24,
-    Bp12,
-    Bp24,
+    LP6,
+    LP12,
+    LP18,
+    LP24,
+    HP6,
+    HP12,
+    HP18,
+    HP24,
+    BP12,
+    BP24,
     N12,
 }
 impl std::fmt::Display for LadderMode {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            LadderMode::Lp6 => write!(f, "Lp6"),
-            LadderMode::Lp12 => write!(f, "Lp12"),
-            LadderMode::Lp18 => write!(f, "Lp18"),
-            LadderMode::Lp24 => write!(f, "Lp24"),
-            LadderMode::Hp6 => write!(f, "Hp6"),
-            LadderMode::Hp12 => write!(f, "Hp12"),
-            LadderMode::Hp18 => write!(f, "Hp18"),
-            LadderMode::Hp24 => write!(f, "Hp24"),
-            LadderMode::Bp12 => write!(f, "Bp12"),
-            LadderMode::Bp24 => write!(f, "Bp24"),
+            LadderMode::LP6 => write!(f, "LP6"),
+            LadderMode::LP12 => write!(f, "LP12"),
+            LadderMode::LP18 => write!(f, "LP18"),
+            LadderMode::LP24 => write!(f, "LP24"),
+            LadderMode::HP6 => write!(f, "HP6"),
+            LadderMode::HP12 => write!(f, "HP12"),
+            LadderMode::HP18 => write!(f, "HP18"),
+            LadderMode::HP24 => write!(f, "HP24"),
+            LadderMode::BP12 => write!(f, "BP12"),
+            LadderMode::BP24 => write!(f, "BP24"),
             LadderMode::N12 => write!(f, "N12"),
         }
     }
 }
+
 pub fn get_ladder_mix(mode: LadderMode) -> [f32; 5] {
     let mix;
     match mode {
-        LadderMode::Lp6 => {
+        LadderMode::LP6 => {
             mix = [0., -1., 0., -0., 0.];
         }
-        LadderMode::Lp12 => {
+        LadderMode::LP12 => {
             mix = [0., -0., 1., -0., 0.];
         }
-        LadderMode::Lp18 => {
+        LadderMode::LP18 => {
             mix = [0., -0., 0., -1., 0.];
         }
-        LadderMode::Lp24 => {
+        LadderMode::LP24 => {
             mix = [0., -0., 0., -0., 1.];
         }
-        LadderMode::Hp6 => {
+        LadderMode::HP6 => {
             mix = [1., -1., 0., -0., 0.];
         }
-        LadderMode::Hp12 => {
+        LadderMode::HP12 => {
             mix = [1., -2., 1., -0., 0.];
         }
-        LadderMode::Hp18 => {
+        LadderMode::HP18 => {
             mix = [1., -3., 3., -1., 0.];
         }
-        LadderMode::Hp24 => {
+        LadderMode::HP24 => {
             mix = [1., -4., 6., -4., 1.];
         }
-        LadderMode::Bp12 => {
+        LadderMode::BP12 => {
             mix = [0., -1., 1., -0., 0.];
         }
-        LadderMode::Bp24 => {
+        LadderMode::BP24 => {
             mix = [0., -0., 1., -2., 1.];
-        } 
+        }
         LadderMode::N12 => {
             mix = [1., -2., 2., -0., 0.];
-
-        },
-          
+        }
     }
     mix
 }
