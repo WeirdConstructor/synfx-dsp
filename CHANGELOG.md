@@ -1,6 +1,9 @@
 0.5.6 (unreleased)
 ==================
 
+* Feature: Added the `fh_va` (`LadderFilter`, `Svf`, `SallenKey`) virtual analog
+filter code by Fredemus.
+
 0.5.5 (2022-11-01)
 ==================
 

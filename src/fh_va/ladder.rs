@@ -36,7 +36,8 @@ enum EstimateSource {
 /// Circuit solved by applying KCL, finding the jacobian of the entire system
 /// and then applying newton's method.
 /// 
-/// By mixing the output of the different stages, and the output of the feedback, we can create many other filter types. See `LadderMode`
+/// By mixing the output of the different stages, and the output of the
+/// feedback, we can create many other filter types. See `LadderMode`
 #[derive(Debug, Clone)]
 pub struct LadderFilter {
     pub params: Arc<FilterParams>,
