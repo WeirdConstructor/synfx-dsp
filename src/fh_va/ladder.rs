@@ -8,6 +8,9 @@
 
 use crate::fh_va::FilterParams;
 use std::simd::*;
+use std::simd::cmp::SimdPartialEq;
+use std::simd::cmp::SimdPartialOrd;
+use std::simd::prelude::SimdFloat;
 use std::sync::Arc;
 
 use super::{LadderMode, get_ladder_mix};

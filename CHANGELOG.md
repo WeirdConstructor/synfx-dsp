@@ -1,6 +1,7 @@
 0.5.6 (unreleased)
 ==================
 
+* Bugfix: SIMD code was not compatible with recent Rust nightly versions.
 * Feature: Added the `fh_va` (`LadderFilter`, `Svf`, `SallenKey`) virtual analog
 filter code by Fredemus.
 
