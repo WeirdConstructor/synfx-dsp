@@ -259,6 +259,7 @@ pub use oscillators::*;
 pub use oversampling::Oversampling;
 pub use oversampling::PolyIIRHalfbandFilter;
 pub use rand::*;
+#[allow(unused)]
 pub use test::*;
 pub use trig_clock::*;
 pub use waveshapers::*;

@@ -1,4 +1,4 @@
-0.5.6 (unreleased)
+0.5.6 (2024-01-04)
 ==================
 
 * Bugfix: SIMD code was not compatible with recent Rust nightly versions.
